@@ -189,7 +189,6 @@
                     }
                 };
                 wrapper.appendChild(iframe);
-                if (loadingDiv) loadingDiv.remove();
                 embedContainer.appendChild(wrapper);
             } else if (provider === 'instagram') {
                 // Instagram embed using blockquote (works with their embed.js)
@@ -208,18 +207,43 @@
                 blockquote.style.padding = '0';
                 blockquote.style.display = 'block';
                 
-                if (loadingDiv) loadingDiv.remove();
                 wrapper.appendChild(blockquote);
                 embedContainer.appendChild(wrapper);
+                
+                // Function to hide loading when embed is ready
+                let checkCount = 0;
+                const maxChecks = 20; // Stop checking after 10 seconds
+                function hideInstagramLoading() {
+                    if (loadingDiv && checkCount < maxChecks) {
+                        checkCount++;
+                        // Check if Instagram has rendered the embed - look in wrapper or blockquote
+                        const instagramIframe = wrapper.querySelector('iframe') || blockquote.querySelector('iframe');
+                        const hasContent = blockquote.children.length > 0 && blockquote.innerHTML.length > 200;
+                        if (instagramIframe || hasContent) {
+                            loadingDiv.remove();
+                        } else {
+                            // Check again after a short delay
+                            setTimeout(hideInstagramLoading, 500);
+                        }
+                    } else if (loadingDiv && checkCount >= maxChecks) {
+                        // Timeout - remove loading anyway
+                        loadingDiv.remove();
+                    }
+                }
                 
                 // Load Instagram embed script if not already loaded
                 if (!window.instgrm) {
                     const script = document.createElement('script');
                     script.src = 'https://www.instagram.com/embed.js';
                     script.async = true;
+                    script.onload = () => {
+                        // Start checking immediately and continue
+                        setTimeout(hideInstagramLoading, 500);
+                    };
                     document.body.appendChild(script);
                 } else {
                     window.instgrm.Embeds.process();
+                    setTimeout(hideInstagramLoading, 500);
                 }
             } else if (provider === 'twitter') {
                 // Twitter embed using blockquote (works with their widgets.js)
@@ -233,9 +257,30 @@
                 link.href = url;
                 blockquote.appendChild(link);
                 
-                if (loadingDiv) loadingDiv.remove();
                 wrapper.appendChild(blockquote);
                 embedContainer.appendChild(wrapper);
+                
+                // Function to hide loading when Twitter embed is ready
+                let checkCount = 0;
+                const maxChecks = 20; // Stop checking after 10 seconds
+                function hideTwitterLoading() {
+                    if (loadingDiv && checkCount < maxChecks) {
+                        checkCount++;
+                        // Check if Twitter has rendered the embed (look for iframe or rendered content)
+                        const twitterIframe = wrapper.querySelector('iframe') || blockquote.querySelector('iframe');
+                        const twitterRendered = wrapper.querySelector('.twitter-tweet-rendered') || blockquote.querySelector('.twitter-tweet-rendered');
+                        const hasContent = blockquote.innerHTML.length > link.outerHTML.length + 50;
+                        if (twitterIframe || twitterRendered || hasContent) {
+                            loadingDiv.remove();
+                        } else {
+                            // Check again after a short delay
+                            setTimeout(hideTwitterLoading, 500);
+                        }
+                    } else if (loadingDiv && checkCount >= maxChecks) {
+                        // Timeout - remove loading anyway
+                        loadingDiv.remove();
+                    }
+                }
                 
                 // Load Twitter embed script if not already loaded
                 if (!window.twttr) {
@@ -247,11 +292,14 @@
                     script.onload = () => {
                         if (window.twttr && window.twttr.widgets) {
                             window.twttr.widgets.load();
+                            // Start checking immediately
+                            setTimeout(hideTwitterLoading, 1000);
                         }
                     };
                     document.body.appendChild(script);
                 } else {
                     window.twttr.widgets.load();
+                    setTimeout(hideTwitterLoading, 1000);
                 }
             } else {
                 // Fallback: show link

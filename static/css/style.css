@@ -392,6 +392,8 @@ body {
     padding: 40px;
     text-align: center;
     color: #666;
+    font-size: 0.95em;
+    display: block;
 }
 
 .post-embed .embed-error {
