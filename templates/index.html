@@ -16,6 +16,9 @@
         </div>
         <div class="top-bar-right">
             <div class="header-badge">Spanish → English</div>
+            {% if user.is_authenticated %}
+                <div class="user-display-name">{{ user.display_name }}</div>
+            {% endif %}
         </div>
     </div>
     
