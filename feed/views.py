@@ -6,14 +6,48 @@ from django.db.models import Q
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Post, PostStatus
+from .models import Post, PostStatus, EngagementEvent
 
 
-def post_to_dict(post):
+def get_user_engagement_map(user, post_ids):
+    """
+    Batch fetch engagement events for a user and list of post IDs.
+    
+    Returns a dictionary mapping post_id (UUID) to engagement_type string.
+    If no engagement event exists for a post, it won't be in the dict.
+    
+    Args:
+        user: User instance
+        post_ids: List of Post UUIDs
+        
+    Returns:
+        dict: {post_id: engagement_type} where engagement_type is "helpful", "confusing", or "none"
+    """
+    if not user or not user.is_authenticated or not post_ids:
+        return {}
+    
+    engagement_events = EngagementEvent.objects.filter(
+        user=user,
+        post_id__in=post_ids
+    ).select_related('post')
+    
+    # Build map: post_id -> engagement_type
+    engagement_map = {}
+    for event in engagement_events:
+        engagement_map[event.post_id] = event.engagement_type
+    
+    return engagement_map
+
+
+def post_to_dict(post, my_engagement_type=None):
     """
     Convert a Post model instance to the API response format.
+    
+    Args:
+        post: Post model instance
+        my_engagement_type: Optional engagement type for the current user ("helpful", "confusing", or "none")
     """
-    return {
+    result = {
         "id": str(post.id),
         "created_at": post.created_at.isoformat(),
         "languages": {
@@ -42,6 +76,12 @@ def post_to_dict(post):
             "display_name": post.author_user.display_name or "Anonymous"
         }
     }
+    
+    # Only include my_engagement_type if user is authenticated
+    if my_engagement_type is not None:
+        result["my_engagement_type"] = my_engagement_type
+    
+    return result
 
 
 def generate_cursor(created_at_str):
@@ -119,8 +159,18 @@ class FeedView(APIView):
         # Get only the requested number of posts
         posts_list = posts_list[:limit]
         
+        # Fetch user engagement map if user is authenticated
+        engagement_map = {}
+        if request.user.is_authenticated:
+            post_ids = [post.id for post in posts_list]
+            engagement_map = get_user_engagement_map(request.user, post_ids)
+        
         # Convert Post objects to response format
-        posts = [post_to_dict(post) for post in posts_list]
+        posts = []
+        for post in posts_list:
+            # Get engagement type for this post, default to "none" if not found
+            my_engagement_type = engagement_map.get(post.id, "none") if request.user.is_authenticated else None
+            posts.append(post_to_dict(post, my_engagement_type=my_engagement_type))
         
         # Generate next cursor if there are more posts
         next_cursor = None

@@ -457,14 +457,28 @@ body {
     display: flex;
     align-items: center;
     gap: 5px;
+    cursor: default;
+    user-select: none;
+    color: #9e9e9e; /* Gray for neutral state */
 }
 
 .engagement-item.helpful {
-    color: #4caf50;
+    color: #9e9e9e; /* Gray for neutral state */
 }
 
 .engagement-item.confusing {
-    color: #ff9800;
+    color: #9e9e9e; /* Gray for neutral state */
+}
+
+/* Active state styling - when user has selected this engagement type */
+.engagement-item.helpful.active {
+    color: #4caf50; /* Bright green */
+    font-weight: 700; /* Bold */
+}
+
+.engagement-item.confusing.active {
+    color: #ff9800; /* Bright orange */
+    font-weight: 700; /* Bold */
 }
 
 .post-author {

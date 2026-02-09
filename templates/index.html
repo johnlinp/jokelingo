@@ -67,6 +67,13 @@
         }
         
         function renderPost(post) {
+            // Get my_engagement_type, default to "none" if not present (for anonymous users)
+            const myEngagementType = post.my_engagement_type || "none";
+            
+            // Determine active classes based on user's engagement state
+            const helpfulActive = myEngagementType === "helpful" ? " active" : "";
+            const confusingActive = myEngagementType === "confusing" ? " active" : "";
+            
             return `
                 <div class="post-card">
                     <div class="post-embed" id="embed-${post.id}">
@@ -84,11 +91,11 @@
                         ` : ''}
                     </div>
                     <div class="post-engagement">
-                        <div class="engagement-item helpful">
+                        <div class="engagement-item helpful${helpfulActive}" onclick="void(0)">
                             <span>👍</span>
                             <span>${post.engagement.helpful} helpful</span>
                         </div>
-                        <div class="engagement-item confusing">
+                        <div class="engagement-item confusing${confusingActive}" onclick="void(0)">
                             <span>😕</span>
                             <span>${post.engagement.confusing} confusing</span>
                         </div>
