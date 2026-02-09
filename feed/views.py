@@ -4,10 +4,12 @@ from datetime import datetime
 from django.utils import timezone
 from django.db.models import Q, F
 from django.db import transaction, IntegrityError
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Post, PostStatus, EngagementEvent, EngagementType
+from .models import Post, PostStatus, EngagementEvent, EngagementType, AnalyticsEvent
 
 
 def get_user_engagement_map(user, post_ids):
@@ -357,4 +359,36 @@ class EngagementView(APIView):
             )
         
         # Return 204 No Content (no JSON body)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class AnalyticsView(APIView):
+    """
+    API endpoint for recording analytics events.
+    
+    POST /api/v1/analytics/events
+    
+    Request body:
+    {
+        "event_type": string,
+        "metadata": { ... }  // optional
+    }
+    
+    Returns:
+        204 No Content on success
+    """
+    
+    def post(self, request):
+        event_type = request.data.get('event_type', '')
+        metadata = request.data.get('metadata')
+        user_agent = request.META.get('HTTP_USER_AGENT', None)
+        
+        AnalyticsEvent.objects.create(
+            event_type=event_type,
+            user=request.user if request.user.is_authenticated else None,
+            metadata=metadata,
+            user_agent=user_agent
+        )
+        
         return Response(status=status.HTTP_204_NO_CONTENT)

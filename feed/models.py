@@ -5,6 +5,7 @@ This module defines the database schema:
 - User: Custom user model
 - Post: Source + translation + explanation posts
 - EngagementEvent: Source of truth for user engagement (helpful/confusing)
+- AnalyticsEvent: Privacy-friendly analytics events (no IP, no sessions)
 """
 
 import uuid
@@ -153,3 +154,49 @@ class EngagementEvent(models.Model):
     
     def __str__(self):
         return f"{self.user} -> {self.post}: {self.engagement_type}"
+
+
+class AnalyticsEventType(models.TextChoices):
+    """Analytics event type enum."""
+    ENGAGEMENT_CLICK_ANON = 'engagement_click_anon', 'Engagement Click (Anonymous)'
+    LOGIN_CLICK_TOPRIGHT_ANON = 'login_click_topright_anon', 'Login Click Top-Right (Anonymous)'
+    LOAD_MORE_CLICK = 'load_more_click', 'Load More Click'
+
+
+class AnalyticsEvent(models.Model):
+    """
+    Analytics event model for tracking user interactions.
+    
+    Privacy-friendly analytics - no IP addresses or session IDs stored.
+    Table name: analytics_event
+    """
+    
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    event_type = models.CharField(
+        max_length=50,
+        choices=AnalyticsEventType.choices,
+        db_index=True
+    )
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    user = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        related_name='analytics_events',
+        null=True,
+        blank=True,
+        db_index=True
+    )
+    metadata = models.JSONField(null=True, blank=True)
+    user_agent = models.TextField(null=True, blank=True)
+    
+    class Meta:
+        db_table = 'analytics_event'
+        indexes = [
+            models.Index(fields=['event_type', '-created_at']),
+            models.Index(fields=['user', '-created_at']),
+        ]
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        user_str = str(self.user) if self.user else 'Anonymous'
+        return f"{self.event_type} by {user_str} at {self.created_at}"

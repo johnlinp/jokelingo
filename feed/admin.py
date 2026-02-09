@@ -3,7 +3,7 @@ Django admin configuration for Jokelingo models.
 """
 
 from django.contrib import admin
-from .models import Post, User, EngagementEvent
+from .models import Post, User, EngagementEvent, AnalyticsEvent
 
 
 @admin.register(Post)
@@ -88,3 +88,27 @@ class EngagementEventAdmin(admin.ModelAdmin):
     search_fields = ['post__id', 'user__email']
     readonly_fields = ['id', 'created_at', 'updated_at']
     raw_id_fields = ['post', 'user']
+
+
+@admin.register(AnalyticsEvent)
+class AnalyticsEventAdmin(admin.ModelAdmin):
+    """Admin interface for AnalyticsEvent model."""
+    
+    list_display = ['id', 'event_type', 'user', 'created_at']
+    list_filter = ['event_type', 'created_at']
+    search_fields = ['id', 'user__id', 'user__email']
+    readonly_fields = ['id', 'created_at', 'event_type', 'user', 'metadata', 'user_agent']
+    
+    def has_add_permission(self, request):
+        """Disable adding analytics events through admin."""
+        return False
+    
+    def has_change_permission(self, request, obj=None):
+        """Disable editing analytics events through admin."""
+        return False
+    
+    def has_delete_permission(self, request, obj=None):
+        """Allow deletion for debugging purposes."""
+        return True
+    
+    date_hierarchy = 'created_at'

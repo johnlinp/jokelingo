@@ -91,6 +91,37 @@
         const debounceTimers = {};
         const pendingRequests = {};
         
+        // Analytics tracking function
+        function trackAnalyticsEvent(eventType, metadata = null) {
+            const payload = {
+                event_type: eventType
+            };
+            if (metadata) {
+                payload.metadata = metadata;
+            }
+            
+            const payloadStr = JSON.stringify(payload);
+            
+            // Prefer sendBeacon for fire-and-forget analytics (more reliable for page unload)
+            if (navigator.sendBeacon) {
+                const blob = new Blob([payloadStr], { type: 'application/json' });
+                navigator.sendBeacon('/api/v1/analytics/events', blob);
+            } else {
+                // Fallback to fetch with keepalive
+                fetch('/api/v1/analytics/events', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: payloadStr,
+                    keepalive: true
+                }).catch(err => {
+                    // Silently fail - analytics are best-effort
+                    console.debug('Analytics event failed:', err);
+                });
+            }
+        }
+        
         function showLoading(append = false) {
             loading.style.display = 'block';
             error.style.display = 'none';
@@ -372,6 +403,13 @@
         }
         
         function loadNextPage() {
+            // Track analytics event for load more click
+            trackAnalyticsEvent('load_more_click', {
+                page_cursor: currentCursor || null,
+                source_language_code: currentParams.source_language_code || null,
+                target_language_code: currentParams.target_language_code || null
+            });
+            
             loadFeed(currentParams, currentCursor, true); // true = append mode
         }
         
@@ -495,6 +533,16 @@
             
             // Check if user is authenticated
             if (!isAuthenticated) {
+                // Track analytics event for anonymous user engagement click
+                const postId = item.dataset.postId;
+                const engagementType = item.dataset.engagementType;
+                if (postId && engagementType) {
+                    trackAnalyticsEvent('engagement_click_anon', {
+                        post_id: postId,
+                        engagement_type: engagementType
+                    });
+                }
+                
                 // Show login modal for anonymous users
                 const loginModal = document.getElementById('loginModal');
                 if (loginModal) {
@@ -583,6 +631,10 @@
             
             // Open modal when login button is clicked
             loginBtn.addEventListener('click', () => {
+                // Track analytics event for top-right login button click (only for anonymous users)
+                if (!isAuthenticated) {
+                    trackAnalyticsEvent('login_click_topright_anon');
+                }
                 loginModal.classList.add('show');
             });
             
