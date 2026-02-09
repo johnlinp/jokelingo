@@ -17,7 +17,12 @@
         <div class="top-bar-right">
             <div class="header-badge">Spanish → English</div>
             {% if user.is_authenticated %}
-                <div class="user-display-name">{{ user.display_name }}</div>
+                <div class="user-menu-container">
+                    <div class="user-display-name" id="userMenuTrigger">{{ user.display_name }}</div>
+                    <div class="user-menu-dropdown" id="userMenuDropdown">
+                        <a href="/accounts/logout/" class="user-menu-item">Logout</a>
+                    </div>
+                </div>
             {% endif %}
         </div>
     </div>
@@ -524,6 +529,27 @@
             });
         }
         
+        // User menu dropdown functionality
+        function initUserMenu() {
+            const trigger = document.getElementById('userMenuTrigger');
+            const dropdown = document.getElementById('userMenuDropdown');
+            
+            if (!trigger || !dropdown) return;
+            
+            // Toggle dropdown on click
+            trigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dropdown.classList.toggle('show');
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!trigger.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.classList.remove('show');
+                }
+            });
+        }
+        
         // Load initial feed on page load
         window.addEventListener('DOMContentLoaded', () => {
             currentParams = {
@@ -532,6 +558,7 @@
                 target_language_code: 'en_US',
             };
             loadFeed(currentParams);
+            initUserMenu();
         });
     </script>
 </body>
