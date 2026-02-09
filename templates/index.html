@@ -34,6 +34,9 @@
     </div>
     
     <script>
+        // Authentication status from Django template
+        const isAuthenticated = {% if user.is_authenticated %}true{% else %}false{% endif %};
+        
         let currentCursor = null;
         let currentParams = {};
         
@@ -41,6 +44,28 @@
         const error = document.getElementById('error');
         const postsContainer = document.getElementById('postsContainer');
         const pagination = document.getElementById('pagination');
+        
+        // Get CSRF token from cookie
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        
+        const csrftoken = getCookie('csrftoken');
+        
+        // Debounce timers for each post
+        const debounceTimers = {};
+        const pendingRequests = {};
         
         function showLoading(append = false) {
             loading.style.display = 'block';
@@ -67,15 +92,18 @@
         }
         
         function renderPost(post) {
-            // Get my_engagement_type, default to "none" if not present (for anonymous users)
+            // Get my_engagement_type, default to "none" if not present (only set for authenticated users)
             const myEngagementType = post.my_engagement_type || "none";
             
-            // Determine active classes based on user's engagement state
+            // Determine active classes
             const helpfulActive = myEngagementType === "helpful" ? " active" : "";
             const confusingActive = myEngagementType === "confusing" ? " active" : "";
             
+            // Make clickable only if authenticated (use global isAuthenticated variable)
+            const clickableClass = isAuthenticated ? " clickable" : "";
+            
             return `
-                <div class="post-card">
+                <div class="post-card" data-post-id="${post.id}">
                     <div class="post-embed" id="embed-${post.id}">
                         <div class="provider-badge">${post.source.provider}</div>
                         <div class="embed-loading">Loading embedded post...</div>
@@ -91,13 +119,13 @@
                         ` : ''}
                     </div>
                     <div class="post-engagement">
-                        <div class="engagement-item helpful${helpfulActive}" onclick="void(0)">
+                        <div class="engagement-item helpful${helpfulActive}${clickableClass}" data-engagement-type="helpful" data-post-id="${post.id}">
                             <span>👍</span>
-                            <span>${post.engagement.helpful} helpful</span>
+                            <span class="engagement-count">${post.engagement.helpful}</span> <span class="engagement-label">helpful</span>
                         </div>
-                        <div class="engagement-item confusing${confusingActive}" onclick="void(0)">
+                        <div class="engagement-item confusing${confusingActive}${clickableClass}" data-engagement-type="confusing" data-post-id="${post.id}">
                             <span>😕</span>
-                            <span>${post.engagement.confusing} confusing</span>
+                            <span class="engagement-count">${post.engagement.confusing}</span> <span class="engagement-label">confusing</span>
                         </div>
                     </div>
                     <div class="post-author">
@@ -143,6 +171,8 @@
                             embedPost(post);
                         });
                     }
+                    // Attach engagement click handlers
+                    attachEngagementHandlers();
                 } else {
                     if (!append) {
                         postsContainer.innerHTML = '<div class="post-card"><p>No posts found.</p></div>';
@@ -322,6 +352,176 @@
         
         function loadNextPage() {
             loadFeed(currentParams, currentCursor, true); // true = append mode
+        }
+        
+        // Get current engagement state for a post from DOM
+        function getPostEngagementState(postId) {
+            const postCard = document.querySelector(`[data-post-id="${postId}"]`);
+            if (!postCard) return "none";
+            
+            const helpfulItem = postCard.querySelector('.engagement-item.helpful');
+            const confusingItem = postCard.querySelector('.engagement-item.confusing');
+            
+            if (helpfulItem && helpfulItem.classList.contains('active')) {
+                return "helpful";
+            } else if (confusingItem && confusingItem.classList.contains('active')) {
+                return "confusing";
+            }
+            return "none";
+        }
+        
+        // Update UI optimistically
+        function updateEngagementUI(postId, newType) {
+            const postCard = document.querySelector(`[data-post-id="${postId}"]`);
+            if (!postCard) return;
+            
+            const helpfulItem = postCard.querySelector('.engagement-item.helpful');
+            const confusingItem = postCard.querySelector('.engagement-item.confusing');
+            const helpfulCount = postCard.querySelector('.engagement-item.helpful .engagement-count');
+            const confusingCount = postCard.querySelector('.engagement-item.confusing .engagement-count');
+            
+            const currentType = getPostEngagementState(postId);
+            
+            // Remove active states
+            helpfulItem.classList.remove('active');
+            confusingItem.classList.remove('active');
+            
+            // Calculate count changes
+            let helpfulDelta = 0;
+            let confusingDelta = 0;
+            
+            // Remove old engagement
+            if (currentType === "helpful") {
+                helpfulDelta = -1;
+            } else if (currentType === "confusing") {
+                confusingDelta = -1;
+            }
+            
+            // Add new engagement
+            if (newType === "helpful") {
+                helpfulItem.classList.add('active');
+                helpfulDelta += 1;
+            } else if (newType === "confusing") {
+                confusingItem.classList.add('active');
+                confusingDelta += 1;
+            }
+            
+            // Update counts optimistically
+            if (helpfulCount) {
+                const currentCount = parseInt(helpfulCount.textContent) || 0;
+                const newCount = Math.max(0, currentCount + helpfulDelta);
+                helpfulCount.textContent = newCount;
+            }
+            
+            if (confusingCount) {
+                const currentCount = parseInt(confusingCount.textContent) || 0;
+                const newCount = Math.max(0, currentCount + confusingDelta);
+                confusingCount.textContent = newCount;
+            }
+        }
+        
+        // Send engagement to backend
+        async function submitEngagement(postId, engagementType) {
+            // Cancel any pending request for this post
+            if (pendingRequests[postId]) {
+                pendingRequests[postId].abort();
+            }
+            
+            // Create new abort controller
+            const controller = new AbortController();
+            pendingRequests[postId] = controller;
+            
+            try {
+                const response = await fetch(`/api/v1/posts/${postId}/engagement`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrftoken,
+                    },
+                    body: JSON.stringify({
+                        engagement_type: engagementType
+                    }),
+                    signal: controller.signal
+                });
+                
+                if (response.status === 401) {
+                    // User is not authenticated, reload page to show login
+                    window.location.reload();
+                    return;
+                }
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                // Success - no need to do anything, UI is already updated optimistically
+            } catch (err) {
+                if (err.name === 'AbortError') {
+                    // Request was cancelled, ignore
+                    return;
+                }
+                console.error('Error submitting engagement:', err);
+                // On error, reload feed to get correct state
+                loadFeed(currentParams, currentCursor, false);
+            } finally {
+                delete pendingRequests[postId];
+            }
+        }
+        
+        // Handle engagement click with debouncing
+        function handleEngagementClick(event) {
+            const item = event.currentTarget;
+            if (!item.classList.contains('clickable')) {
+                return; // Not authenticated, ignore click
+            }
+            
+            const postId = item.dataset.postId;
+            const engagementType = item.dataset.engagementType;
+            
+            // Get current state
+            const currentType = getPostEngagementState(postId);
+            
+            // Determine new state based on toggle logic
+            let newType;
+            if (engagementType === "helpful") {
+                if (currentType === "helpful") {
+                    newType = "none"; // Toggle off
+                } else {
+                    newType = "helpful"; // Toggle on or switch from confusing
+                }
+            } else if (engagementType === "confusing") {
+                if (currentType === "confusing") {
+                    newType = "none"; // Toggle off
+                } else {
+                    newType = "confusing"; // Toggle on or switch from helpful
+                }
+            }
+            
+            // Update UI immediately (optimistic update)
+            updateEngagementUI(postId, newType);
+            
+            // Clear existing debounce timer for this post
+            if (debounceTimers[postId]) {
+                clearTimeout(debounceTimers[postId]);
+            }
+            
+            // Set new debounce timer (2 seconds)
+            debounceTimers[postId] = setTimeout(() => {
+                submitEngagement(postId, newType);
+                delete debounceTimers[postId];
+            }, 2000);
+        }
+        
+        // Attach click handlers to engagement items
+        function attachEngagementHandlers() {
+            const engagementItems = document.querySelectorAll('.engagement-item.clickable');
+            engagementItems.forEach(item => {
+                // Remove existing listeners by cloning
+                const newItem = item.cloneNode(true);
+                item.parentNode.replaceChild(newItem, item);
+                // Add click listener
+                newItem.addEventListener('click', handleEngagementClick);
+            });
         }
         
         // Load initial feed on page load

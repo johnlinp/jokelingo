@@ -2,11 +2,12 @@ import base64
 import json
 from datetime import datetime
 from django.utils import timezone
-from django.db.models import Q
+from django.db.models import Q, F
+from django.db import transaction, IntegrityError
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Post, PostStatus, EngagementEvent
+from .models import Post, PostStatus, EngagementEvent, EngagementType
 
 
 def get_user_engagement_map(user, post_ids):
@@ -100,6 +101,100 @@ def parse_cursor(cursor_str):
         return json.loads(cursor_json)
     except (ValueError, json.JSONDecodeError):
         return None
+
+
+@transaction.atomic
+def set_engagement(user, post_id, new_type):
+    """
+    Transaction-safe function to set user engagement on a post.
+    
+    This function:
+    - Ensures exactly one engagement_event row per (post_id, user_id)
+    - Updates cached counters correctly using delta logic
+    - Uses F() expressions for atomic counter updates
+    - Ensures counters never go below 0
+    
+    Args:
+        user: User instance (must be authenticated)
+        post_id: UUID of the post
+        new_type: New engagement type ("helpful", "confusing", or "none")
+        
+    Returns:
+        tuple: (success: bool, error_message: str or None)
+    """
+    # Validate engagement type
+    valid_types = ['helpful', 'confusing', 'none']
+    if new_type not in valid_types:
+        return False, f"Invalid engagement_type: {new_type}"
+    
+    # Get or create engagement event with select_for_update to prevent race conditions
+    try:
+        engagement_event = EngagementEvent.objects.select_for_update().get(
+            post_id=post_id,
+            user=user
+        )
+        old_type = engagement_event.engagement_type
+    except EngagementEvent.DoesNotExist:
+        # Create new engagement event
+        try:
+            engagement_event = EngagementEvent.objects.create(
+                post_id=post_id,
+                user=user,
+                engagement_type=new_type
+            )
+            old_type = 'none'
+        except IntegrityError:
+            # Race condition: another request created it, retry by getting it
+            engagement_event = EngagementEvent.objects.select_for_update().get(
+                post_id=post_id,
+                user=user
+            )
+            old_type = engagement_event.engagement_type
+    
+    # Calculate counter deltas
+    helpful_delta = 0
+    confusing_delta = 0
+    
+    # Remove old engagement
+    if old_type == 'helpful':
+        helpful_delta -= 1
+    elif old_type == 'confusing':
+        confusing_delta -= 1
+    
+    # Add new engagement
+    if new_type == 'helpful':
+        helpful_delta += 1
+    elif new_type == 'confusing':
+        confusing_delta += 1
+    
+    # Update engagement event
+    engagement_event.engagement_type = new_type
+    engagement_event.save()
+    
+    # Update cached counters atomically using F() expressions
+    post = Post.objects.select_for_update().get(id=post_id)
+    
+    if helpful_delta != 0:
+        # Use update() with F() to update atomically
+        Post.objects.filter(id=post_id).update(
+            helpful_count_cache=F('helpful_count_cache') + helpful_delta
+        )
+        # Refresh to get actual value and clamp to ensure >= 0
+        post.refresh_from_db()
+        if post.helpful_count_cache < 0:
+            Post.objects.filter(id=post_id).update(helpful_count_cache=0)
+    
+    if confusing_delta != 0:
+        # Use update() with F() to update atomically
+        Post.objects.filter(id=post_id).update(
+            confusing_count_cache=F('confusing_count_cache') + confusing_delta
+        )
+        # Refresh to get actual value and clamp to ensure >= 0
+        post.refresh_from_db()
+        if post.confusing_count_cache < 0:
+            Post.objects.filter(id=post_id).update(confusing_count_cache=0)
+    
+    return True, None
 
 
 class FeedView(APIView):
@@ -201,3 +296,65 @@ class FeedView(APIView):
             response_data["meta"]["next_cursor"] = next_cursor
         
         return Response(response_data, status=status.HTTP_200_OK)
+
+
+class EngagementView(APIView):
+    """
+    API endpoint for setting user engagement on a post.
+    
+    POST /api/v1/posts/<post_id>/engagement
+    
+    Request body:
+    {
+        "engagement_type": "helpful" | "confusing" | "none"
+    }
+    
+    Returns:
+        204 No Content on success
+        401 Unauthorized if not authenticated
+        400 Bad Request if invalid input
+        404 Not Found if post doesn't exist
+    """
+    
+    def post(self, request, post_id):
+        # Check authentication
+        if not request.user.is_authenticated:
+            return Response(
+                {"error": "Authentication required"},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+        
+        # Parse request body
+        try:
+            engagement_type = request.data.get('engagement_type')
+            if not engagement_type:
+                return Response(
+                    {"error": "engagement_type is required"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        except Exception:
+            return Response(
+                {"error": "Invalid request body"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Validate post exists
+        try:
+            post = Post.objects.get(id=post_id, status=PostStatus.ACTIVE)
+        except Post.DoesNotExist:
+            return Response(
+                {"error": "Post not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        # Set engagement
+        success, error_message = set_engagement(request.user, post_id, engagement_type)
+        
+        if not success:
+            return Response(
+                {"error": error_message},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Return 204 No Content (no JSON body)
+        return Response(status=status.HTTP_204_NO_CONTENT)
