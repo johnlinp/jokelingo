@@ -123,9 +123,6 @@
             const helpfulActive = myEngagementType === "helpful" ? " active" : "";
             const confusingActive = myEngagementType === "confusing" ? " active" : "";
             
-            // Make clickable only if authenticated (use global isAuthenticated variable)
-            const clickableClass = isAuthenticated ? " clickable" : "";
-            
             return `
                 <div class="post-card" data-post-id="${post.id}">
                     <div class="post-embed" id="embed-${post.id}">
@@ -143,11 +140,11 @@
                         ` : ''}
                     </div>
                     <div class="post-engagement">
-                        <div class="engagement-item helpful${helpfulActive}${clickableClass}" data-engagement-type="helpful" data-post-id="${post.id}">
+                        <div class="engagement-item helpful${helpfulActive} clickable" data-engagement-type="helpful" data-post-id="${post.id}">
                             <span>👍</span>
                             <span class="engagement-count">${post.engagement.helpful}</span> <span class="engagement-label">helpful</span>
                         </div>
-                        <div class="engagement-item confusing${confusingActive}${clickableClass}" data-engagement-type="confusing" data-post-id="${post.id}">
+                        <div class="engagement-item confusing${confusingActive} clickable" data-engagement-type="confusing" data-post-id="${post.id}">
                             <span>😕</span>
                             <span class="engagement-count">${post.engagement.confusing}</span> <span class="engagement-label">confusing</span>
                         </div>
@@ -495,8 +492,15 @@
         // Handle engagement click with debouncing
         function handleEngagementClick(event) {
             const item = event.currentTarget;
-            if (!item.classList.contains('clickable')) {
-                return; // Not authenticated, ignore click
+            
+            // Check if user is authenticated
+            if (!isAuthenticated) {
+                // Show login modal for anonymous users
+                const loginModal = document.getElementById('loginModal');
+                if (loginModal) {
+                    loginModal.classList.add('show');
+                }
+                return;
             }
             
             const postId = item.dataset.postId;
@@ -543,7 +547,7 @@
                 // Remove existing listeners by cloning
                 const newItem = item.cloneNode(true);
                 item.parentNode.replaceChild(newItem, item);
-                // Add click listener
+                // Add click listener (works for both authenticated and anonymous users)
                 newItem.addEventListener('click', handleEngagementClick);
             });
         }
