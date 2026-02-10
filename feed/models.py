@@ -71,8 +71,8 @@ class Post(models.Model):
     )
     
     # Languages
-    source_language_code = models.CharField(max_length=10)  # e.g., 'es_ES'
-    target_language_code = models.CharField(max_length=10)  # e.g., 'en_US'
+    source_language_code = models.CharField(max_length=10)  # e.g., 'es'
+    target_language_code = models.CharField(max_length=10)  # e.g., 'en'
     
     # Source
     source_provider = models.CharField(

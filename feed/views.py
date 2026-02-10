@@ -205,8 +205,8 @@ class FeedView(APIView):
     
     Query parameters:
     - limit: Number of posts to return (default: 10)
-    - source_language_code: Filter by source language (e.g., "es_ES")
-    - target_language_code: Filter by target language (e.g., "en_US")
+    - source_language_code: Filter by source language (e.g., "es")
+    - target_language_code: Filter by target language (e.g., "en")
     - cursor: Pagination cursor (optional)
     """
     
