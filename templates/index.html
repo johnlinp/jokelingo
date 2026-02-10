@@ -393,6 +393,55 @@
                     window.twttr.widgets.load();
                     setTimeout(hideTwitterLoading, 1000);
                 }
+            } else if (provider === 'imgur') {
+                // Imgur embed using blockquote (works with their embed.js)
+                const wrapper = document.createElement('div');
+                wrapper.style.textAlign = 'center';
+                wrapper.style.width = '100%';
+                
+                // Extract image ID from URL - get the last part after last hyphen or slash
+                const pathname = new URL(url).pathname;
+                const imageId = pathname.split('/').pop().split('-').pop();
+                
+                const blockquote = document.createElement('blockquote');
+                blockquote.className = 'imgur-embed-pub';
+                blockquote.setAttribute('lang', 'en');
+                blockquote.setAttribute('data-id', imageId);
+                const link = document.createElement('a');
+                link.href = url;
+                link.textContent = 'View on Imgur';
+                blockquote.appendChild(link);
+                
+                wrapper.appendChild(blockquote);
+                embedContainer.appendChild(wrapper);
+                
+                // Function to hide loading when embed is ready
+                let checkCount = 0;
+                const maxChecks = 20;
+                function hideImgurLoading() {
+                    if (loadingDiv && checkCount < maxChecks) {
+                        checkCount++;
+                        const imgurIframe = wrapper.querySelector('iframe');
+                        if (imgurIframe) {
+                            loadingDiv.remove();
+                        } else {
+                            setTimeout(hideImgurLoading, 500);
+                        }
+                    } else if (loadingDiv) {
+                        loadingDiv.remove();
+                    }
+                }
+                
+                // Load Imgur embed script if not already loaded
+                if (!document.querySelector('script[src*="s.imgur.com/min/embed.js"]')) {
+                    const script = document.createElement('script');
+                    script.src = 'https://s.imgur.com/min/embed.js';
+                    script.async = true;
+                    script.onload = () => setTimeout(hideImgurLoading, 500);
+                    document.body.appendChild(script);
+                } else {
+                    setTimeout(hideImgurLoading, 500);
+                }
             } else {
                 // Fallback: show link
                 if (loadingDiv) {

@@ -674,3 +674,32 @@ body {
 .pagination button {
     margin: 0 5px;
 }
+
+/* Imgur embed blockquote */
+.post-embed > div .imgur-embed-pub {
+    margin: 0 auto !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    display: block !important;
+    width: 100% !important;
+    max-width: 540px !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+}
+
+.post-embed > div .imgur-embed-pub iframe {
+    width: 100% !important;
+    max-width: 540px !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+}
+
+@media (min-width: 769px) {
+    .post-embed > div .imgur-embed-pub {
+        width: 540px !important;
+    }
+    
+    .post-embed > div .imgur-embed-pub iframe {
+        width: 540px !important;
+    }
+}
