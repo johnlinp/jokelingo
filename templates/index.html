@@ -259,29 +259,60 @@
             const loadingDiv = embedContainer.querySelector('.embed-loading');
             
             if (provider === 'reddit') {
-                // Reddit embed using iframe - using larger height to minimize scrolling
-                const redditEmbedUrl = url.replace('www.reddit.com', 'embed.reddit.com') + '?embed=true';
+                // Reddit embed using official embed script
                 const wrapper = document.createElement('div');
                 wrapper.style.textAlign = 'center';
                 wrapper.style.width = '100%';
-                const iframe = document.createElement('iframe');
-                iframe.src = redditEmbedUrl;
-                iframe.style.width = '600px';
-                iframe.style.maxWidth = '100%';
-                iframe.style.height = '1000px'; // Large height to fit most Reddit posts
-                iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups');
-                iframe.setAttribute('scrolling', 'no');
-                iframe.onload = () => {
-                    if (loadingDiv) loadingDiv.remove();
-                };
-                iframe.onerror = () => {
-                    if (loadingDiv) {
-                        loadingDiv.className = 'embed-error';
-                        loadingDiv.textContent = 'Unable to load Reddit embed.';
-                    }
-                };
-                wrapper.appendChild(iframe);
+                
+                // Create a blockquote element that Reddit's embed script will process
+                const blockquote = document.createElement('blockquote');
+                blockquote.className = 'reddit-embed';
+                blockquote.setAttribute('data-embed-theme', 'light');
+                blockquote.setAttribute('data-embed-height', '600');
+                
+                const link = document.createElement('a');
+                link.href = url;
+                link.textContent = url;
+                blockquote.appendChild(link);
+                
+                wrapper.appendChild(blockquote);
                 embedContainer.appendChild(wrapper);
+                
+                // Function to hide loading when Reddit embed is ready
+                let checkCount = 0;
+                const maxChecks = 20; // Stop checking after 10 seconds
+                function hideRedditLoading() {
+                    if (loadingDiv && checkCount < maxChecks) {
+                        checkCount++;
+                        // Check if Reddit has rendered the embed (look for iframe)
+                        const redditIframe = wrapper.querySelector('iframe') || blockquote.querySelector('iframe');
+                        if (redditIframe) {
+                            loadingDiv.remove();
+                        } else {
+                            // Check again after a short delay
+                            setTimeout(hideRedditLoading, 500);
+                        }
+                    } else if (loadingDiv && checkCount >= maxChecks) {
+                        // Timeout - remove loading anyway
+                        loadingDiv.remove();
+                    }
+                }
+                
+                // Load Reddit embed script if not already loaded
+                if (!document.querySelector('script[src*="embed.reddit.com/widgets.js"]')) {
+                    const script = document.createElement('script');
+                    script.src = 'https://embed.reddit.com/widgets.js';
+                    script.async = true;
+                    script.charset = 'UTF-8';
+                    script.onload = () => {
+                        // Start checking immediately
+                        setTimeout(hideRedditLoading, 500);
+                    };
+                    document.body.appendChild(script);
+                } else {
+                    // Script already loaded, start checking immediately
+                    setTimeout(hideRedditLoading, 500);
+                }
             } else if (provider === 'instagram') {
                 // Instagram embed using blockquote (works with their embed.js)
                 const wrapper = document.createElement('div');
