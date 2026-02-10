@@ -610,12 +610,14 @@ body {
     font-weight: 400;
     color: #4a5568;
     margin-bottom: 10px;
+    white-space: pre-line;
 }
 
 .post-contribution .explanation {
     font-size: 0.95em;
     font-weight: 400;
     color: #4a5568;
+    white-space: pre-line;
 }
 
 .post-engagement {
