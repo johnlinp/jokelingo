@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jokelingo</title>
     {% load static %}
-    <link rel="canonical" href="https://www.jokelingo.com/es/en/">
+    <link rel="canonical" href="{{ canonical_url }}">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="icon" href="{% static 'images/favicon.ico' %}">
 </head>
@@ -16,7 +16,22 @@
             <p>Learn a new language while having fun</p>
         </div>
         <div class="top-bar-right">
-            <div class="header-badge">Spanish → English</div>
+            <div class="header-badge" id="headerBadge"></div>
+            <script>
+                // Set header badge immediately using LANGUAGE_NAMES
+                (function() {
+                    const LANGUAGE_NAMES = {
+                        'es': 'Spanish',
+                        'fr': 'French',
+                        'en': 'English',
+                    };
+                    const sourceCode = '{{ source_language_code }}';
+                    const targetCode = '{{ target_language_code }}';
+                    const sourceName = LANGUAGE_NAMES[sourceCode] || sourceCode;
+                    const targetName = LANGUAGE_NAMES[targetCode] || targetCode;
+                    document.getElementById('headerBadge').textContent = `${sourceName} → ${targetName}`;
+                })();
+            </script>
             {% if user.is_authenticated %}
                 <div class="user-menu-container">
                     <div class="user-display-name" id="userMenuTrigger">{{ user.display_name }}</div>
@@ -59,6 +74,13 @@
     </div>
     
     <script>
+        // Language code to display name mapping
+        const LANGUAGE_NAMES = {
+            'es': 'Spanish',
+            'fr': 'French',
+            'en': 'English',
+        };
+        
         // Authentication status from Django template
         const isAuthenticated = {% if user.is_authenticated %}true{% else %}false{% endif %};
         
@@ -745,8 +767,8 @@
         window.addEventListener('DOMContentLoaded', () => {
             currentParams = {
                 limit: '10',
-                source_language_code: 'es',
-                target_language_code: 'en',
+                source_language_code: '{{ source_language_code }}',
+                target_language_code: '{{ target_language_code }}',
             };
             loadFeed(currentParams);
             initUserMenu();
