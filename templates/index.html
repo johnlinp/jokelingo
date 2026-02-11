@@ -322,7 +322,8 @@
                 }
                 
                 // Load Reddit embed script if not already loaded
-                if (!document.querySelector('script[src*="embed.reddit.com/widgets.js"]')) {
+                const existingScript = document.querySelector('script[src*="embed.reddit.com/widgets.js"]');
+                if (!existingScript) {
                     const script = document.createElement('script');
                     script.src = 'https://embed.reddit.com/widgets.js';
                     script.async = true;
@@ -333,8 +334,26 @@
                     };
                     document.body.appendChild(script);
                 } else {
-                    // Script already loaded, start checking immediately
-                    setTimeout(hideRedditLoading, 500);
+                    // Script already loaded - Reddit's embed script needs to process new embeds
+                    // Reddit's embed script processes embeds on initial page load,
+                    // but doesn't automatically process new embeds added dynamically.
+                    // Solution: Add a new script instance to trigger processing of new embeds.
+                    // Reddit's script will process all .reddit-embed elements when it loads,
+                    // including the new one we just added.
+                    
+                    // Create a new script instance - Reddit's script can handle multiple instances
+                    // and will process all unprocessed .reddit-embed elements
+                    const newScript = document.createElement('script');
+                    newScript.src = 'https://embed.reddit.com/widgets.js';
+                    newScript.async = true;
+                    newScript.charset = 'UTF-8';
+                    newScript.setAttribute('data-reddit-embed-helper', 'true');
+                    newScript.onload = () => {
+                        // Start checking for the iframe after script loads
+                        setTimeout(hideRedditLoading, 500);
+                    };
+                    // Append the new script - it will process the new embed
+                    document.body.appendChild(newScript);
                 }
             } else if (provider === 'instagram') {
                 // Instagram embed using blockquote (works with their embed.js)
