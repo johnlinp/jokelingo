@@ -17,9 +17,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-poc-key-change-in-production'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# DEBUG defaults to False for security
+# Set DEBUG=True in local development environment variables
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['*']
+# ALLOWED_HOSTS must be set via environment variable
+# Set ALLOWED_HOSTS environment variable (comma-separated list of allowed hosts)
+allowed_hosts_env = os.environ.get('ALLOWED_HOSTS')
+ALLOWED_HOSTS = allowed_hosts_env.split(',') if allowed_hosts_env else []
 
 SITE_ID = 1
 

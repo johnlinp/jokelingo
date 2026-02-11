@@ -30,6 +30,11 @@ Jokelingo is a platform for learning a new language while having fun.
    python3 manage.py migrate
    ```
 
+5. **Set environment variables for local development:**
+   ```bash
+   export DEBUG=True
+   ```
+
 ## Running the Server
 
 Start the Django development server:
