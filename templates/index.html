@@ -16,7 +16,13 @@
             <p>Learn a new language while having fun</p>
         </div>
         <div class="top-bar-right">
-            <div class="header-badge" id="headerBadge"></div>
+            <div class="language-menu-container">
+                <div class="header-badge" id="headerBadge"></div>
+                <div class="language-menu-dropdown" id="languageMenuDropdown">
+                    <a href="/es/en/" class="language-menu-item">Spanish → English</a>
+                    <a href="/fr/en/" class="language-menu-item">French → English</a>
+                </div>
+            </div>
             <script>
                 // Set header badge immediately using LANGUAGE_NAMES
                 (function() {
@@ -782,6 +788,27 @@
             });
         }
         
+        // Language menu dropdown functionality
+        function initLanguageMenu() {
+            const trigger = document.getElementById('headerBadge');
+            const dropdown = document.getElementById('languageMenuDropdown');
+            
+            if (!trigger || !dropdown) return;
+            
+            // Toggle dropdown on click
+            trigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dropdown.classList.toggle('show');
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!trigger.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.classList.remove('show');
+                }
+            });
+        }
+        
         // Load initial feed on page load
         window.addEventListener('DOMContentLoaded', () => {
             currentParams = {
@@ -792,6 +819,7 @@
             loadFeed(currentParams);
             initUserMenu();
             initLoginModal();
+            initLanguageMenu();
         });
     </script>
 </body>
