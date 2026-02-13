@@ -33,10 +33,19 @@ def root_redirect_view(request):
     
     return redirect(preferred_path, permanent=False)
 
+def login_view(request):
+    """View that renders the login page."""
+    # If user is already authenticated, redirect to root (which handles language preference)
+    if request.user.is_authenticated:
+        return redirect('/', permanent=False)
+    
+    return render(request, 'login.html')
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("accounts/", include("allauth.urls")),
     path('api/v1/', include('feed.urls')),
+    path('login/', login_view, name='login'),
     path('es/en/', lambda request: language_feed_view(request, 'es', 'en'), name='es_en_index'),
     path('fr/en/', lambda request: language_feed_view(request, 'fr', 'en'), name='fr_en_index'),
     path('', root_redirect_view, name='root_redirect'),

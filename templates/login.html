@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Jokelingo</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="icon" href="{% static 'images/favicon.ico' %}">
+    <style>
+        .login-page-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 80px);
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .login-content {
+            background: white;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .login-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .login-header h2 {
+            margin: 0;
+            font-size: 1.5em;
+            color: #2d3748;
+        }
+        
+        .login-body {
+            padding: 24px;
+        }
+        
+        .login-body p {
+            margin: 0 0 20px 0;
+            color: #4a5568;
+            font-size: 0.95em;
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #4a5568;
+            text-decoration: none;
+            font-size: 0.9em;
+        }
+        
+        .back-link:hover {
+            color: #2d3748;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <h1>Jokelingo</h1>
+            <p>Learn a new language while having fun</p>
+        </div>
+        <div class="top-bar-right">
+            <div class="language-menu-container">
+                <div class="header-badge" id="headerBadge">Spanish → English</div>
+                <div class="language-menu-dropdown" id="languageMenuDropdown">
+                    <a href="/es/en/" class="language-menu-item">Spanish → English</a>
+                    <a href="/fr/en/" class="language-menu-item">French → English</a>
+                </div>
+            </div>
+            {% if user.is_authenticated %}
+                <div class="user-menu-container">
+                    <div class="user-display-name" id="userMenuTrigger">{{ user.display_name }}</div>
+                    <div class="user-menu-dropdown" id="userMenuDropdown">
+                        <a href="/accounts/logout/" class="user-menu-item">Logout</a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="login-page-container">
+        <div class="login-content">
+            <div class="login-header">
+                <h2>Login to Jokelingo</h2>
+            </div>
+            <div class="login-body">
+                <p>Sign in to mark posts as helpful or confusing; and later, to create your own posts. We will never post anything on your behalf.</p>
+                <a href="/accounts/google/login/" class="google-login-btn">
+                    <img src="https://fonts.gstatic.com/s/i/productlogos/googleg/v6/24px.svg" alt="Google" width="18" height="18">
+                    Continue with Google
+                </a>
+                <a href="/" class="back-link">← Back to home</a>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Language menu dropdown functionality
+        function initLanguageMenu() {
+            const trigger = document.getElementById('headerBadge');
+            const dropdown = document.getElementById('languageMenuDropdown');
+            
+            if (!trigger || !dropdown) return;
+            
+            // Toggle dropdown on click
+            trigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dropdown.classList.toggle('show');
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!trigger.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.classList.remove('show');
+                }
+            });
+        }
+        
+        // User menu dropdown functionality
+        function initUserMenu() {
+            const trigger = document.getElementById('userMenuTrigger');
+            const dropdown = document.getElementById('userMenuDropdown');
+            
+            if (!trigger || !dropdown) return;
+            
+            // Toggle dropdown on click
+            trigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dropdown.classList.toggle('show');
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!trigger.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.classList.remove('show');
+                }
+            });
+        }
+        
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            initLanguageMenu();
+            initUserMenu();
+        });
+    </script>
+</body>
+</html>
