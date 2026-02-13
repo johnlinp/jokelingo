@@ -95,7 +95,7 @@
             </div>
             <div class="login-body">
                 <p>Sign in to mark posts as helpful or confusing; and later, to create your own posts. We will never post anything on your behalf.</p>
-                <a href="/accounts/google/login/" class="google-login-btn">
+                <a href="/accounts/google/login/{% if next %}?next={{ next|urlencode }}{% endif %}" class="google-login-btn">
                     <img src="https://fonts.gstatic.com/s/i/productlogos/googleg/v6/24px.svg" alt="Google" width="18" height="18">
                     Continue with Google
                 </a>

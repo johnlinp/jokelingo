@@ -35,17 +35,32 @@ def root_redirect_view(request):
 
 def login_view(request):
     """View that renders the login page."""
-    # If user is already authenticated, redirect to root (which handles language preference)
+    # If user is already authenticated, redirect to next parameter or root
     if request.user.is_authenticated:
-        return redirect('/', permanent=False)
+        next_url = request.GET.get('next', '/')
+        return redirect(next_url, permanent=False)
     
-    return render(request, 'login.html')
+    # Pass next parameter to template so it can be included in OAuth link
+    context = {
+        'next': request.GET.get('next', '')
+    }
+    return render(request, 'login.html', context)
+
+def my_notes_view(request):
+    """View that renders the My Notes page."""
+    # Check authentication
+    if not request.user.is_authenticated:
+        # Redirect to login with next parameter
+        return redirect(f'/login/?next=/me/notes/', permanent=False)
+    
+    return render(request, 'my_notes.html')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("accounts/", include("allauth.urls")),
     path('api/v1/', include('feed.urls')),
     path('login/', login_view, name='login'),
+    path('me/notes/', my_notes_view, name='my_notes'),
     path('es/en/', lambda request: language_feed_view(request, 'es', 'en'), name='es_en_index'),
     path('fr/en/', lambda request: language_feed_view(request, 'fr', 'en'), name='fr_en_index'),
     path('', root_redirect_view, name='root_redirect'),

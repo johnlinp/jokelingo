@@ -96,6 +96,16 @@ def generate_cursor(created_at_str):
     return base64.b64encode(cursor_bytes).decode('utf-8')
 
 
+def generate_cursor_from_updated_at(updated_at_str):
+    """Generate cursor from updated_at timestamp for notes pagination."""
+    cursor_data = {
+        "updated_at": updated_at_str
+    }
+    cursor_json = json.dumps(cursor_data, sort_keys=True)
+    cursor_bytes = cursor_json.encode('utf-8')
+    return base64.b64encode(cursor_bytes).decode('utf-8')
+
+
 def parse_cursor(cursor_str):
     try:
         cursor_bytes = base64.b64decode(cursor_str.encode('utf-8'))
@@ -290,6 +300,101 @@ class FeedView(APIView):
                 "limit": limit,
                 "has_more": has_more,
                 "applied_filters": applied_filters
+            },
+            "posts": posts
+        }
+        
+        if next_cursor:
+            response_data["meta"]["next_cursor"] = next_cursor
+        
+        return Response(response_data, status=status.HTTP_200_OK)
+
+
+class MyNotesView(APIView):
+    """
+    API endpoint for fetching user's notes (posts marked as helpful).
+    
+    GET /api/v1/me/notes/
+    
+    Query parameters:
+    - limit: Number of posts to return (default: 10)
+    - cursor: Pagination cursor (optional)
+    
+    Returns:
+        200 OK with list of posts
+        401 Unauthorized if not authenticated
+    """
+    
+    def get(self, request):
+        # Check authentication
+        if not request.user.is_authenticated:
+            return Response(
+                {"error": "Authentication required"},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+        
+        limit = request.query_params.get('limit', '10')
+        try:
+            limit = int(limit)
+            if limit < 1:
+                limit = 10
+        except ValueError:
+            limit = 10
+        
+        cursor = request.query_params.get('cursor')
+        
+        # Query engagement_event table for helpful posts
+        # Filter by: user, engagement_type="helpful", post.status="active"
+        queryset = EngagementEvent.objects.filter(
+            user=request.user,
+            engagement_type='helpful',
+            post__status=PostStatus.ACTIVE
+        ).select_related('post', 'post__author_user').order_by('-updated_at')
+        
+        # Handle pagination with cursor (based on updated_at)
+        if cursor:
+            cursor_data = parse_cursor(cursor)
+            if cursor_data:
+                cursor_updated_at = cursor_data.get('updated_at')
+                if cursor_updated_at:
+                    try:
+                        # Parse ISO format string to datetime
+                        cursor_dt = datetime.fromisoformat(cursor_updated_at)
+                        queryset = queryset.filter(updated_at__lt=cursor_dt)
+                    except (ValueError, AttributeError):
+                        pass
+        
+        # Get one extra to check if there are more posts
+        engagement_events_queryset = queryset[:limit + 1]
+        engagement_events_list = list(engagement_events_queryset)
+        
+        # Determine if there are more posts
+        has_more = len(engagement_events_list) > limit
+        
+        # Get only the requested number of engagement events
+        engagement_events_list = engagement_events_list[:limit]
+        
+        # Extract posts from engagement events
+        posts_list = [event.post for event in engagement_events_list]
+        
+        # Since all posts are marked as helpful by this user, we know the engagement type
+        # Convert Post objects to response format
+        posts = []
+        for post in posts_list:
+            # All posts in this list are marked as helpful by the current user
+            posts.append(post_to_dict(post, my_engagement_type="helpful"))
+        
+        # Generate next cursor if there are more posts
+        next_cursor = None
+        if has_more and engagement_events_list:
+            last_event = engagement_events_list[-1]
+            next_cursor = generate_cursor_from_updated_at(last_event.updated_at.isoformat())
+        
+        # Build response
+        response_data = {
+            "meta": {
+                "limit": limit,
+                "has_more": has_more
             },
             "posts": posts
         }
