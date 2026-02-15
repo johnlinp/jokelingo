@@ -758,6 +758,17 @@
             
             if (!loginBtn || !loginModal) return;
             
+            // Helper function to close modal and track analytics
+            function closeLoginModal() {
+                if (loginModal.classList.contains('show')) {
+                    loginModal.classList.remove('show');
+                    // Track analytics event for closing login modal (only for anonymous users)
+                    if (!isAuthenticated) {
+                        trackAnalyticsEvent('login_modal_close');
+                    }
+                }
+            }
+            
             // Open modal when login button is clicked
             loginBtn.addEventListener('click', () => {
                 // Track analytics event for top-right login button click (only for anonymous users)
@@ -769,22 +780,20 @@
             
             // Close modal when close button is clicked
             if (closeModal) {
-                closeModal.addEventListener('click', () => {
-                    loginModal.classList.remove('show');
-                });
+                closeModal.addEventListener('click', closeLoginModal);
             }
             
             // Close modal when clicking outside the modal content
             loginModal.addEventListener('click', (e) => {
                 if (e.target === loginModal) {
-                    loginModal.classList.remove('show');
+                    closeLoginModal();
                 }
             });
             
             // Close modal with Escape key
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape' && loginModal.classList.contains('show')) {
-                    loginModal.classList.remove('show');
+                    closeLoginModal();
                 }
             });
         }
@@ -799,7 +808,13 @@
             // Toggle dropdown on click
             trigger.addEventListener('click', (e) => {
                 e.stopPropagation();
+                const wasShown = dropdown.classList.contains('show');
                 dropdown.classList.toggle('show');
+                
+                // Track analytics event when dropdown is expanded (not when closed)
+                if (!wasShown && dropdown.classList.contains('show')) {
+                    trackAnalyticsEvent('language_menu_expand');
+                }
             });
             
             // Close dropdown when clicking outside
@@ -812,6 +827,11 @@
         
         // Load initial feed on page load
         window.addEventListener('DOMContentLoaded', () => {
+            // Track page landing event
+            trackAnalyticsEvent('page_landing', {
+                path: window.location.pathname
+            });
+            
             currentParams = {
                 limit: '10',
                 source_language_code: '{{ source_language_code }}',

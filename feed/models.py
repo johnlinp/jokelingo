@@ -162,6 +162,9 @@ class AnalyticsEventType(models.TextChoices):
     ENGAGEMENT_CLICK_ANON = 'engagement_click_anon', 'Engagement Click (Anonymous)'
     LOGIN_CLICK_TOPRIGHT_ANON = 'login_click_topright_anon', 'Login Click Top-Right (Anonymous)'
     LOAD_MORE_CLICK = 'load_more_click', 'Load More Click'
+    PAGE_LANDING = 'page_landing', 'Page Landing'
+    LANGUAGE_MENU_EXPAND = 'language_menu_expand', 'Language Menu Expand'
+    LOGIN_MODAL_CLOSE = 'login_modal_close', 'Login Modal Close'
 
 
 class AnalyticsEvent(models.Model):

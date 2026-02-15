@@ -726,6 +726,11 @@
         
         // Load initial notes on page load
         window.addEventListener('DOMContentLoaded', () => {
+            // Track page landing event
+            trackAnalyticsEvent('page_landing', {
+                path: window.location.pathname
+            });
+            
             loadNotes();
             initUserMenu();
         });
