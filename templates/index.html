@@ -132,24 +132,24 @@
             
             const payloadStr = JSON.stringify(payload);
             
-            // Prefer sendBeacon for fire-and-forget analytics (more reliable for page unload)
-            if (navigator.sendBeacon) {
-                const blob = new Blob([payloadStr], { type: 'application/json' });
-                navigator.sendBeacon('/api/v1/analytics/events', blob);
-            } else {
-                // Fallback to fetch with keepalive
-                fetch('/api/v1/analytics/events', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: payloadStr,
-                    keepalive: true
-                }).catch(err => {
-                    // Silently fail - analytics are best-effort
-                    console.debug('Analytics event failed:', err);
-                });
+            // Build headers - include CSRF token if available (needed for authenticated users)
+            const headers = {
+                'Content-Type': 'application/json',
+            };
+            if (csrftoken) {
+                headers['X-CSRFToken'] = csrftoken;
             }
+            
+            // Use fetch with keepalive (sendBeacon doesn't support custom headers like CSRF token)
+            fetch('/api/v1/analytics/events', {
+                method: 'POST',
+                headers: headers,
+                body: payloadStr,
+                keepalive: true
+            }).catch(err => {
+                // Silently fail - analytics are best-effort
+                console.debug('Analytics event failed:', err);
+            });
         }
         
         function showLoading(append = false) {
