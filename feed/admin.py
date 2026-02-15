@@ -2,6 +2,7 @@
 Django admin configuration for Jokelingo models.
 """
 
+import json
 from django.contrib import admin
 from .models import Post, User, EngagementEvent, AnalyticsEvent
 
@@ -94,10 +95,17 @@ class EngagementEventAdmin(admin.ModelAdmin):
 class AnalyticsEventAdmin(admin.ModelAdmin):
     """Admin interface for AnalyticsEvent model."""
     
-    list_display = ['id', 'event_type', 'user', 'created_at']
+    list_display = ['id', 'event_type', 'user', 'metadata_display', 'created_at']
     list_filter = ['event_type', 'created_at']
     search_fields = ['id', 'user__id', 'user__email']
-    readonly_fields = ['id', 'created_at', 'event_type', 'user', 'metadata', 'user_agent']
+    readonly_fields = ['id', 'created_at', 'event_type', 'user', 'metadata_display', 'user_agent']
+    
+    def metadata_display(self, obj):
+        """Display metadata in a readable format."""
+        if obj.metadata:
+            return json.dumps(obj.metadata, indent=2)
+        return '-'
+    metadata_display.short_description = 'Metadata'
     
     def has_add_permission(self, request):
         """Disable adding analytics events through admin."""
