@@ -522,6 +522,61 @@
                 } else {
                     setTimeout(hideImgurLoading, 500);
                 }
+            } else if (provider === 'facebook') {
+                // Facebook embed using fb-post div (works with their SDK)
+                const wrapper = document.createElement('div');
+                wrapper.style.textAlign = 'center';
+                wrapper.style.width = '100%';
+                
+                const fbPost = document.createElement('div');
+                fbPost.className = 'fb-post';
+                fbPost.setAttribute('data-href', url);
+                fbPost.setAttribute('data-width', '500');
+                fbPost.setAttribute('data-show-text', 'true');
+                
+                wrapper.appendChild(fbPost);
+                embedContainer.appendChild(wrapper);
+                
+                // Function to hide loading when embed is ready
+                let checkCount = 0;
+                const maxChecks = 20;
+                function hideFacebookLoading() {
+                    if (loadingDiv && checkCount < maxChecks) {
+                        checkCount++;
+                        // Check if Facebook has rendered the embed (look for iframe or rendered content)
+                        const fbIframe = wrapper.querySelector('iframe');
+                        const hasContent = fbPost.children.length > 0 && fbPost.innerHTML.length > 200;
+                        if (fbIframe || hasContent) {
+                            loadingDiv.remove();
+                        } else {
+                            setTimeout(hideFacebookLoading, 500);
+                        }
+                    } else if (loadingDiv && checkCount >= maxChecks) {
+                        // Timeout - remove loading anyway
+                        loadingDiv.remove();
+                    }
+                }
+                
+                // Load Facebook SDK if not already loaded
+                if (!window.FB) {
+                    // Load Facebook SDK script
+                    const script = document.createElement('script');
+                    script.src = 'https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v24.0';
+                    script.async = true;
+                    script.defer = true;
+                    script.crossOrigin = 'anonymous';
+                    script.onload = () => {
+                        if (window.FB) {
+                            window.FB.XFBML.parse(wrapper);
+                            setTimeout(hideFacebookLoading, 1000);
+                        }
+                    };
+                    document.body.appendChild(script);
+                } else {
+                    // SDK already loaded - parse new embed
+                    window.FB.XFBML.parse(wrapper);
+                    setTimeout(hideFacebookLoading, 1000);
+                }
             } else {
                 // Fallback: show link
                 if (loadingDiv) {

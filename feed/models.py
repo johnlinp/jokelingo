@@ -46,6 +46,7 @@ class SourceProvider(models.TextChoices):
     INSTAGRAM = 'instagram', 'Instagram'
     TWITTER = 'twitter', 'Twitter'
     IMGUR = 'imgur', 'Imgur'
+    FACEBOOK = 'facebook', 'Facebook'
 
 
 class Post(models.Model):
