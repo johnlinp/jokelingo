@@ -140,7 +140,7 @@ SOCIALACCOUNT_AUTO_SIGNUP = True
 ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 SOCIALACCOUNT_EMAIL_VERIFICATION = 'none'
-SOCIALACCOUNT_ADAPTER = 'feed.adapters.AccountAdapter'
+SOCIALACCOUNT_ADAPTER = 'feed.adapters.SocialAccountAdapter'
 
 # Social account providers configuration
 SOCIALACCOUNT_PROVIDERS = {
