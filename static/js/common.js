@@ -6,7 +6,7 @@ if (typeof window.isAuthenticated === 'undefined') {
     window.isAuthenticated = false;
 }
 
-// Language code to display name mapping
+// Language code to display name mapping (fallback English names)
 const LANGUAGE_NAMES = {
     'es': 'Spanish',
     'fr': 'French',
@@ -17,6 +17,25 @@ const LANGUAGE_NAMES = {
 
 // Make it globally accessible
 window.LANGUAGE_NAMES = LANGUAGE_NAMES;
+
+// Translation helper function
+function t(key) {
+    // Return translated string if available, otherwise return the key
+    return (window.i18n && window.i18n[key]) || key;
+}
+
+// Get translated language name for a language code
+function getLanguageName(languageCode) {
+    const englishName = LANGUAGE_NAMES[languageCode];
+    if (!englishName) {
+        return languageCode; // Fallback to code if not found
+    }
+    // Return translated name if available, otherwise return English name
+    return t(englishName) || englishName;
+}
+
+// Make it globally accessible
+window.getLanguageName = getLanguageName;
 
 // Get CSRF token from cookie
 function getCookie(name) {
@@ -115,35 +134,35 @@ function renderPost(post, options = {}) {
     const confusingActive = myEngagementType === "confusing" ? " active" : "";
     
     // Build author line - can be customized
-    let authorLine = `By <strong>${post.author.display_name}</strong> • ${formatDate(post.created_at)}`;
+    let authorLine = `${t('By')} <strong>${post.author.display_name}</strong> • ${formatDate(post.created_at)}`;
     if (options.showLanguageInfo && post.languages) {
-        authorLine = `${LANGUAGE_NAMES[post.languages.source_language_code] || post.languages.source_language_code} → ${LANGUAGE_NAMES[post.languages.target_language_code] || post.languages.target_language_code} • ${authorLine}`;
+        authorLine = `${getLanguageName(post.languages.source_language_code)} → ${getLanguageName(post.languages.target_language_code)} • ${authorLine}`;
     }
     
     return `
         <div class="post-card" data-post-id="${post.id}">
             <div class="post-embed" id="embed-${post.id}">
                 <div class="provider-badge">${post.source.provider}</div>
-                <div class="embed-loading">Loading embedded post...</div>
+                <div class="embed-loading">${t('Loading embedded post...')}</div>
             </div>
             <div class="post-contribution">
                 ${post.contribution?.translation?.text ? `
-                    <h4>Translation</h4>
+                    <h4>${t('Translation')}</h4>
                     <div class="translation">${post.contribution.translation.text}</div>
                 ` : ''}
                 ${post.contribution?.explanation?.text ? `
-                    <h4>Explanation</h4>
+                    <h4>${t('Explanation')}</h4>
                     <div class="explanation">${post.contribution.explanation.text}</div>
                 ` : ''}
             </div>
             <div class="post-engagement">
                 <div class="engagement-item helpful${helpfulActive} clickable" data-engagement-type="helpful" data-post-id="${post.id}">
                     <span>👍</span>
-                    <span class="engagement-count">${post.engagement.helpful}</span> <span class="engagement-label">helpful</span>
+                    <span class="engagement-count">${post.engagement.helpful}</span> <span class="engagement-label">${t('helpful')}</span>
                 </div>
                 <div class="engagement-item confusing${confusingActive} clickable" data-engagement-type="confusing" data-post-id="${post.id}">
                     <span>😕</span>
-                    <span class="engagement-count">${post.engagement.confusing}</span> <span class="engagement-label">confusing</span>
+                    <span class="engagement-count">${post.engagement.confusing}</span> <span class="engagement-label">${t('confusing')}</span>
                 </div>
             </div>
             <div class="post-author">

@@ -13,8 +13,8 @@ function initIndexPage(config) {
     
     // Set header badge immediately (runs before DOMContentLoaded)
     function setHeaderBadge() {
-        const sourceName = window.LANGUAGE_NAMES[sourceLanguageCode] || sourceLanguageCode;
-        const targetName = window.LANGUAGE_NAMES[targetLanguageCode] || targetLanguageCode;
+        const sourceName = getLanguageName(sourceLanguageCode);
+        const targetName = getLanguageName(targetLanguageCode);
         const headerBadge = document.getElementById('headerBadge');
         if (headerBadge) {
             headerBadge.textContent = `${sourceName} → ${targetName}`;
@@ -74,7 +74,7 @@ function initIndexPage(config) {
                 attachEngagementHandlers();
             } else {
                 if (!append) {
-                    postsContainer.innerHTML = '<div class="post-card"><p>No posts found.</p></div>';
+                    postsContainer.innerHTML = `<div class="post-card"><p>${t('No posts found.')}</p></div>`;
                 }
             }
             
@@ -82,7 +82,7 @@ function initIndexPage(config) {
             currentCursor = data.meta.next_cursor || null;
             if (data.meta.has_more && currentCursor) {
                 pagination.innerHTML = `
-                    <button class="btn" onclick="loadNextPage()">Load More</button>
+                    <button class="btn" onclick="loadNextPage()">${t('Load More')}</button>
                 `;
                 pagination.style.display = 'block';
             } else {
@@ -91,7 +91,7 @@ function initIndexPage(config) {
             
             hideLoading();
         } catch (err) {
-            showError(`Error loading feed: ${err.message}`);
+            showError(`${t('Error loading feed:')} ${err.message}`);
         }
     }
     

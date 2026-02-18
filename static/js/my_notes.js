@@ -60,10 +60,10 @@ function initMyNotesPage(config) {
                     postsContainer.innerHTML = `
                         <div class="post-card" style="text-align: center; padding: 40px;">
                             <p style="font-size: 1.1em; color: #4a5568; margin-bottom: 10px;">
-                                You haven't added any notes yet.
+                                ${t('You haven\'t added any notes yet.')}
                             </p>
                             <p style="color: #718096;">
-                                Click Helpful on a post to save it here.
+                                ${t('Click Helpful on a post to save it here.')}
                             </p>
                         </div>
                     `;
@@ -74,7 +74,7 @@ function initMyNotesPage(config) {
             currentCursor = data.meta.next_cursor || null;
             if (data.meta.has_more && currentCursor) {
                 pagination.innerHTML = `
-                    <button class="btn" onclick="loadNextPage()">Load More</button>
+                    <button class="btn" onclick="loadNextPage()">${t('Load More')}</button>
                 `;
                 pagination.style.display = 'block';
             } else {
@@ -83,7 +83,7 @@ function initMyNotesPage(config) {
             
             hideLoading();
         } catch (err) {
-            showError(`Error loading notes: ${err.message}`);
+            showError(`${t('Error loading notes:')} ${err.message}`);
         }
     }
     

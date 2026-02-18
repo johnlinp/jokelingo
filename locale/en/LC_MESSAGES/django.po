@@ -1,0 +1,112 @@
+# English translations for Jokelingo
+# Copyright (C) 2024
+# This file is distributed under the same license as the Jokelingo project.
+msgid ""
+msgstr ""
+"Project-Id-Version: Jokelingo\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-01-01 00:00+0000\n"
+"PO-Revision-Date: 2024-01-01 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: English\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Learn a new language while having fun"
+msgstr "Learn a new language while having fun"
+
+msgid "Spanish → English"
+msgstr "Spanish → English"
+
+msgid "French → English"
+msgstr "French → English"
+
+msgid "Korean → English"
+msgstr "Korean → English"
+
+msgid "Korean → Traditional Chinese"
+msgstr "Korean → Traditional Chinese"
+
+msgid "My Notes"
+msgstr "My Notes"
+
+msgid "Logout"
+msgstr "Logout"
+
+msgid "Login"
+msgstr "Login"
+
+msgid "Login to Jokelingo"
+msgstr "Login to Jokelingo"
+
+msgid "Sign in to mark posts as helpful or confusing; and later, to create your own posts. We will never post anything on your behalf."
+msgstr "Sign in to mark posts as helpful or confusing; and later, to create your own posts. We will never post anything on your behalf."
+
+msgid "Continue with Google"
+msgstr "Continue with Google"
+
+msgid "Loading feed..."
+msgstr "Loading feed..."
+
+msgid "Loading notes..."
+msgstr "Loading notes..."
+
+msgid "Posts you've marked as helpful"
+msgstr "Posts you've marked as helpful"
+
+msgid "Back to home"
+msgstr "Back to home"
+
+msgid "No posts found."
+msgstr "No posts found."
+
+msgid "Load More"
+msgstr "Load More"
+
+msgid "Error loading feed:"
+msgstr "Error loading feed:"
+
+msgid "Error loading notes:"
+msgstr "Error loading notes:"
+
+msgid "Click Helpful on a post to save it here."
+msgstr "Click Helpful on a post to save it here."
+
+msgid "Translation"
+msgstr "Translation"
+
+msgid "Explanation"
+msgstr "Explanation"
+
+msgid "helpful"
+msgstr "helpful"
+
+msgid "confusing"
+msgstr "confusing"
+
+msgid "By"
+msgstr "By"
+
+msgid "Loading embedded post..."
+msgstr "Loading embedded post..."
+
+msgid "You haven't added any notes yet."
+msgstr "You haven't added any notes yet."
+
+msgid "Korean"
+msgstr "Korean"
+
+msgid "Traditional Chinese"
+msgstr "Traditional Chinese"
+
+msgid "Spanish"
+msgstr "Spanish"
+
+msgid "English"
+msgstr "English"
+
+msgid "French"
+msgstr "French"

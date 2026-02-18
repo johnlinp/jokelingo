@@ -1,10 +1,11 @@
+{% load i18n %}
+{% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ LANGUAGE_CODE|default:'en' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jokelingo</title>
-    {% load static %}
     <link rel="canonical" href="{{ canonical_url }}">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="icon" href="{% static 'images/favicon.ico' %}">
@@ -13,27 +14,27 @@
     <div class="top-bar">
         <div class="top-bar-left">
             <h1><a href="/">Jokelingo</a></h1>
-            <p>Learn a new language while having fun</p>
+            <p>{% trans "Learn a new language while having fun" %}</p>
         </div>
         <div class="top-bar-right">
             <div class="language-menu-container">
                 <div class="header-badge" id="headerBadge"></div>
                 <div class="language-menu-dropdown" id="languageMenuDropdown">
-                    <a href="/es/en/" class="language-menu-item">Spanish → English</a>
-                    <a href="/fr/en/" class="language-menu-item">French → English</a>
-                    <a href="/ko/en/" class="language-menu-item">Korean → English</a>
+                    <a href="/es/en/" class="language-menu-item">{% trans "Spanish → English" %}</a>
+                    <a href="/fr/en/" class="language-menu-item">{% trans "French → English" %}</a>
+                    <a href="/ko/en/" class="language-menu-item">{% trans "Korean → English" %}</a>
                 </div>
             </div>
             {% if user.is_authenticated %}
                 <div class="user-menu-container">
                     <div class="user-display-name" id="userMenuTrigger">{{ user.display_name }}</div>
                     <div class="user-menu-dropdown" id="userMenuDropdown">
-                        <a href="/me/notes/" class="user-menu-item">My Notes</a>
-                        <a href="/accounts/logout/" class="user-menu-item">Logout</a>
+                        <a href="/me/notes/" class="user-menu-item">{% trans "My Notes" %}</a>
+                        <a href="/accounts/logout/" class="user-menu-item">{% trans "Logout" %}</a>
                     </div>
                 </div>
             {% else %}
-                <button class="login-btn" id="loginBtn">Login</button>
+                <button class="login-btn" id="loginBtn">{% trans "Login" %}</button>
             {% endif %}
         </div>
     
@@ -41,14 +42,14 @@
     <div class="modal-overlay" id="loginModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Login to Jokelingo</h2>
+                <h2>{% trans "Login to Jokelingo" %}</h2>
                 <button class="modal-close" id="closeModal">&times;</button>
             </div>
             <div class="modal-body">
-                <p>Sign in to mark posts as helpful or confusing; and later, to create your own posts. We will never post anything on your behalf.</p>
+                <p>{% trans "Sign in to mark posts as helpful or confusing; and later, to create your own posts. We will never post anything on your behalf." %}</p>
                 <a href="/accounts/google/login/" class="google-login-btn">
                     <img src="https://fonts.gstatic.com/s/i/productlogos/googleg/v6/24px.svg" alt="Google" width="18" height="18">
-                    Continue with Google
+                    {% trans "Continue with Google" %}
                 </a>
             </div>
         </div>
@@ -59,17 +60,48 @@
         
         <div id="error" style="display: none;" class="error"></div>
         
-        <div id="loading" class="loading" style="display: none;">Loading feed...</div>
+        <div id="loading" class="loading" style="display: none;">{% trans "Loading feed..." %}</div>
         
         <div id="postsContainer" class="posts-container"></div>
         
         <div id="pagination" class="pagination" style="display: none;"></div>
     </div>
     
-    {% load static %}
     <script src="{% static 'js/common.js' %}"></script>
     <script src="{% static 'js/index.js' %}"></script>
     <script>
+        // JavaScript translations based on current language
+        {% trans "No posts found." as msg_no_posts %}
+        {% trans "Load More" as msg_load_more %}
+        {% trans "Error loading feed:" as msg_error_feed %}
+        {% trans "Translation" as msg_translation %}
+        {% trans "Explanation" as msg_explanation %}
+        {% trans "helpful" as msg_helpful %}
+        {% trans "confusing" as msg_confusing %}
+        {% trans "By" as msg_by %}
+        {% trans "Loading embedded post..." as msg_loading_embed %}
+        {% trans "Korean" as msg_korean %}
+        {% trans "Traditional Chinese" as msg_traditional_chinese %}
+        {% trans "Spanish" as msg_spanish %}
+        {% trans "English" as msg_english %}
+        {% trans "French" as msg_french %}
+        window.i18n = {
+            'No posts found.': '{{ msg_no_posts|escapejs }}',
+            'Load More': '{{ msg_load_more|escapejs }}',
+            'Error loading feed:': '{{ msg_error_feed|escapejs }}',
+            'Translation': '{{ msg_translation|escapejs }}',
+            'Explanation': '{{ msg_explanation|escapejs }}',
+            'helpful': '{{ msg_helpful|escapejs }}',
+            'confusing': '{{ msg_confusing|escapejs }}',
+            'By': '{{ msg_by|escapejs }}',
+            'Loading embedded post...': '{{ msg_loading_embed|escapejs }}',
+            'Korean': '{{ msg_korean|escapejs }}',
+            'Traditional Chinese': '{{ msg_traditional_chinese|escapejs }}',
+            'Spanish': '{{ msg_spanish|escapejs }}',
+            'English': '{{ msg_english|escapejs }}',
+            'French': '{{ msg_french|escapejs }}'
+        };
+        
         // Initialize the page with Django template variables
         initIndexPage({
             isAuthenticated: {% if user.is_authenticated %}true{% else %}false{% endif %},

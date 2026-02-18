@@ -1,11 +1,12 @@
+{% load i18n %}
+{% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ LANGUAGE_CODE|default:'en' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex">
-    <title>My Notes - Jokelingo</title>
-    {% load static %}
+    <title>{% trans "My Notes" %} - Jokelingo</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="icon" href="{% static 'images/favicon.ico' %}">
 </head>
@@ -13,42 +14,77 @@
     <div class="top-bar">
         <div class="top-bar-left">
             <h1><a href="/">Jokelingo</a></h1>
-            <p>Learn a new language while having fun</p>
+            <p>{% trans "Learn a new language while having fun" %}</p>
         </div>
         <div class="top-bar-right">
             {% if user.is_authenticated %}
                 <div class="user-menu-container">
                     <div class="user-display-name" id="userMenuTrigger">{{ user.display_name }}</div>
                     <div class="user-menu-dropdown" id="userMenuDropdown">
-                        <a href="/me/notes/" class="user-menu-item">My Notes</a>
-                        <a href="/accounts/logout/" class="user-menu-item">Logout</a>
+                        <a href="/me/notes/" class="user-menu-item">{% trans "My Notes" %}</a>
+                        <a href="/accounts/logout/" class="user-menu-item">{% trans "Logout" %}</a>
                     </div>
                 </div>
             {% else %}
-                <button class="login-btn" id="loginBtn">Login</button>
+                <button class="login-btn" id="loginBtn">{% trans "Login" %}</button>
             {% endif %}
         </div>
     </div>
     
     <div class="container">
         <div class="page-header" style="margin-bottom: 20px;">
-            <h2 style="margin: 0; color: #2d3748;">My Notes</h2>
-            <p style="margin: 10px 0 0 0; color: #4a5568;">Posts you've marked as helpful</p>
+            <h2 style="margin: 0; color: #2d3748;">{% trans "My Notes" %}</h2>
+            <p style="margin: 10px 0 0 0; color: #4a5568;">{% trans "Posts you've marked as helpful" %}</p>
         </div>
         
         <div id="error" style="display: none;" class="error"></div>
         
-        <div id="loading" class="loading" style="display: none;">Loading notes...</div>
+        <div id="loading" class="loading" style="display: none;">{% trans "Loading notes..." %}</div>
         
         <div id="postsContainer" class="posts-container"></div>
         
         <div id="pagination" class="pagination" style="display: none;"></div>
     </div>
     
-    {% load static %}
     <script src="{% static 'js/common.js' %}"></script>
     <script src="{% static 'js/my_notes.js' %}"></script>
     <script>
+        // JavaScript translations based on current language
+        {% trans "No posts found." as msg_no_posts %}
+        {% trans "Load More" as msg_load_more %}
+        {% trans "Error loading notes:" as msg_error_notes %}
+        {% trans "Click Helpful on a post to save it here." as msg_click_helpful %}
+        {% trans "You haven't added any notes yet." as msg_no_notes_yet %}
+        {% trans "Translation" as msg_translation %}
+        {% trans "Explanation" as msg_explanation %}
+        {% trans "helpful" as msg_helpful %}
+        {% trans "confusing" as msg_confusing %}
+        {% trans "By" as msg_by %}
+        {% trans "Loading embedded post..." as msg_loading_embed %}
+        {% trans "Korean" as msg_korean %}
+        {% trans "Traditional Chinese" as msg_traditional_chinese %}
+        {% trans "Spanish" as msg_spanish %}
+        {% trans "English" as msg_english %}
+        {% trans "French" as msg_french %}
+        window.i18n = {
+            'No posts found.': '{{ msg_no_posts|escapejs }}',
+            'Load More': '{{ msg_load_more|escapejs }}',
+            'Error loading notes:': '{{ msg_error_notes|escapejs }}',
+            'Click Helpful on a post to save it here.': '{{ msg_click_helpful|escapejs }}',
+            'You haven\'t added any notes yet.': '{{ msg_no_notes_yet|escapejs }}',
+            'Translation': '{{ msg_translation|escapejs }}',
+            'Explanation': '{{ msg_explanation|escapejs }}',
+            'helpful': '{{ msg_helpful|escapejs }}',
+            'confusing': '{{ msg_confusing|escapejs }}',
+            'By': '{{ msg_by|escapejs }}',
+            'Loading embedded post...': '{{ msg_loading_embed|escapejs }}',
+            'Korean': '{{ msg_korean|escapejs }}',
+            'Traditional Chinese': '{{ msg_traditional_chinese|escapejs }}',
+            'Spanish': '{{ msg_spanish|escapejs }}',
+            'English': '{{ msg_english|escapejs }}',
+            'French': '{{ msg_french|escapejs }}'
+        };
+        
         // Initialize the page with Django template variables
         initMyNotesPage({
             isAuthenticated: {% if user.is_authenticated %}true{% else %}false{% endif %}
