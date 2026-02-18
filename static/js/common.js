@@ -12,6 +12,7 @@ const LANGUAGE_NAMES = {
     'fr': 'French',
     'ko': 'Korean',
     'en': 'English',
+    'zh-hant': 'Traditional Chinese',
 };
 
 // Make it globally accessible
