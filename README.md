@@ -33,6 +33,7 @@ Jokelingo is a platform for learning a new language while having fun.
 5. **Set environment variables for local development:**
    ```bash
    export DEBUG=True
+   export DATABASE_URL=postgresql://postgres:secret123@localhost:5432/postgres
    ```
 
 ## Running the Server
