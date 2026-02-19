@@ -28,7 +28,7 @@ def root_redirect_view(request):
     preferred_path = request.COOKIES.get('preferred_language_path', '/es/en/')
     
     # Validate that the preferred path is one of our valid language paths
-    if preferred_path not in ['/es/en/', '/fr/en/', '/ko/en/', '/ko/zh-hant/']:
+    if preferred_path not in ['/es/en/', '/fr/en/', '/ko/en/', '/ko/zh-hant/', '/es/zh-hant/']:
         preferred_path = '/es/en/'
     
     return redirect(preferred_path, permanent=False)
@@ -65,5 +65,6 @@ urlpatterns = [
     path('fr/en/', lambda request: language_feed_view(request, 'fr', 'en'), name='fr_en_index'),
     path('ko/en/', lambda request: language_feed_view(request, 'ko', 'en'), name='ko_en_index'),
     path('ko/zh-hant/', lambda request: language_feed_view(request, 'ko', 'zh-hant'), name='ko_zh_hant_index'),
+    path('es/zh-hant/', lambda request: language_feed_view(request, 'es', 'zh-hant'), name='es_zh_hant_index'),
     path('', root_redirect_view, name='root_redirect'),
 ]
