@@ -177,6 +177,9 @@ function initIndexPage(config) {
     function initLanguageMenu() {
         const trigger = document.getElementById('headerBadge');
         const dropdown = document.getElementById('languageMenuDropdown');
+        const moreLanguagesBtn = document.getElementById('moreLanguagesBtn');
+        const moreLanguagesModal = document.getElementById('moreLanguagesModal');
+        const closeMoreLanguagesModal = document.getElementById('closeMoreLanguagesModal');
         
         if (!trigger || !dropdown) return;
         
@@ -198,6 +201,44 @@ function initIndexPage(config) {
                 dropdown.classList.remove('show');
             }
         });
+        
+        // More Languages modal functionality
+        if (moreLanguagesBtn && moreLanguagesModal) {
+            // Open modal when "More Languages" is clicked
+            moreLanguagesBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropdown.classList.remove('show'); // Close dropdown
+                moreLanguagesModal.classList.add('show');
+                trackAnalyticsEvent('more_languages_click');
+            });
+            
+            // Helper function to close modal
+            function closeMoreLanguagesModalFunc() {
+                if (moreLanguagesModal.classList.contains('show')) {
+                    moreLanguagesModal.classList.remove('show');
+                }
+            }
+            
+            // Close modal when close button is clicked
+            if (closeMoreLanguagesModal) {
+                closeMoreLanguagesModal.addEventListener('click', closeMoreLanguagesModalFunc);
+            }
+            
+            // Close modal when clicking outside the modal content
+            moreLanguagesModal.addEventListener('click', (e) => {
+                if (e.target === moreLanguagesModal) {
+                    closeMoreLanguagesModalFunc();
+                }
+            });
+            
+            // Close modal with Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && moreLanguagesModal.classList.contains('show')) {
+                    closeMoreLanguagesModalFunc();
+                }
+            });
+        }
     }
     
     // Load initial feed on page load

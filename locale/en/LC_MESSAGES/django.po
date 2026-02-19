@@ -33,6 +33,9 @@ msgstr "Korean → Traditional Chinese"
 msgid "Spanish → Traditional Chinese"
 msgstr "Spanish → Traditional Chinese"
 
+msgid "More Languages"
+msgstr "More Languages"
+
 msgid "My Notes"
 msgstr "My Notes"
 

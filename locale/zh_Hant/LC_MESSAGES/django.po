@@ -33,6 +33,9 @@ msgstr "韓文 → 正體中文"
 msgid "Spanish → Traditional Chinese"
 msgstr "西班牙文 → 正體中文"
 
+msgid "More Languages"
+msgstr "更多語言"
+
 msgid "My Notes"
 msgstr "我的筆記"
 

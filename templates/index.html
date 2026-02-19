@@ -28,6 +28,7 @@
                         <a href="/es/zh-hant/" class="language-menu-item">{% trans "Spanish → Traditional Chinese" %}</a>
                         <a href="/ko/zh-hant/" class="language-menu-item">{% trans "Korean → Traditional Chinese" %}</a>
                     {% endif %}
+                    <a href="#" class="language-menu-item" id="moreLanguagesBtn">{% trans "More Languages" %}</a>
                 </div>
             </div>
             {% if user.is_authenticated %}
@@ -56,6 +57,33 @@
                     <img src="https://fonts.gstatic.com/s/i/productlogos/googleg/v6/24px.svg" alt="Google" width="18" height="18">
                     {% trans "Continue with Google" %}
                 </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- More Languages Modal -->
+    <div class="modal-overlay" id="moreLanguagesModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>{% trans "More Languages" %}</h2>
+                <button class="modal-close" id="closeMoreLanguagesModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="margin-bottom: 20px;">
+                    <p style="font-weight: 600; margin-bottom: 10px;">If you know English:</p>
+                    <ul style="list-style: none; padding-left: 0;">
+                        <li style="margin-bottom: 8px;"><a href="/es/en/" style="color: #667eea; text-decoration: none;">Spanish → English</a></li>
+                        <li style="margin-bottom: 8px;"><a href="/fr/en/" style="color: #667eea; text-decoration: none;">French → English</a></li>
+                        <li style="margin-bottom: 8px;"><a href="/ko/en/" style="color: #667eea; text-decoration: none;">Korean → English</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <p style="font-weight: 600; margin-bottom: 10px;">如果你會中文:</p>
+                    <ul style="list-style: none; padding-left: 0;">
+                        <li style="margin-bottom: 8px;"><a href="/es/zh-hant/" style="color: #667eea; text-decoration: none;">西班牙文 → 正體中文</a></li>
+                        <li style="margin-bottom: 8px;"><a href="/ko/zh-hant/" style="color: #667eea; text-decoration: none;">韓文 → 正體中文</a></li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
