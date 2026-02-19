@@ -314,6 +314,17 @@ body {
         margin-top: 10px;
     }
     
+    .language-menu-dropdown {
+        right: auto;
+        left: 0;
+        min-width: 200px;
+    }
+    
+    .user-menu-dropdown {
+        right: auto;
+        left: 0;
+    }
+    
     .post-card {
         padding: 15px;
     }
