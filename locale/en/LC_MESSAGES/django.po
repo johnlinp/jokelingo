@@ -30,6 +30,9 @@ msgstr "Korean → English"
 msgid "Korean → Traditional Chinese"
 msgstr "Korean → Traditional Chinese"
 
+msgid "Spanish → Traditional Chinese"
+msgstr "Spanish → Traditional Chinese"
+
 msgid "My Notes"
 msgstr "My Notes"
 

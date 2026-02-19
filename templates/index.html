@@ -20,9 +20,14 @@
             <div class="language-menu-container">
                 <div class="header-badge" id="headerBadge"></div>
                 <div class="language-menu-dropdown" id="languageMenuDropdown">
-                    <a href="/es/en/" class="language-menu-item">{% trans "Spanish → English" %}</a>
-                    <a href="/fr/en/" class="language-menu-item">{% trans "French → English" %}</a>
-                    <a href="/ko/en/" class="language-menu-item">{% trans "Korean → English" %}</a>
+                    {% if target_language_code == "en" %}
+                        <a href="/es/en/" class="language-menu-item">{% trans "Spanish → English" %}</a>
+                        <a href="/fr/en/" class="language-menu-item">{% trans "French → English" %}</a>
+                        <a href="/ko/en/" class="language-menu-item">{% trans "Korean → English" %}</a>
+                    {% elif target_language_code == "zh-hant" %}
+                        <a href="/es/zh-hant/" class="language-menu-item">{% trans "Spanish → Traditional Chinese" %}</a>
+                        <a href="/ko/zh-hant/" class="language-menu-item">{% trans "Korean → Traditional Chinese" %}</a>
+                    {% endif %}
                 </div>
             </div>
             {% if user.is_authenticated %}

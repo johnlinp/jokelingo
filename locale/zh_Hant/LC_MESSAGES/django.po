@@ -30,6 +30,9 @@ msgstr "韓文 → 英文"
 msgid "Korean → Traditional Chinese"
 msgstr "韓文 → 正體中文"
 
+msgid "Spanish → Traditional Chinese"
+msgstr "西班牙文 → 正體中文"
+
 msgid "My Notes"
 msgstr "我的筆記"
 
