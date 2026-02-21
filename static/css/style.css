@@ -300,25 +300,28 @@ body {
     .top-bar {
         padding: 15px 20px;
         margin: -10px -10px 20px -10px;
-        flex-wrap: nowrap;
+        flex-wrap: wrap;
     }
     
     .top-bar-left {
         flex-direction: row;
         align-items: center;
         gap: 10px;
+        width: 100%;
+    }
+    
+    .top-bar-left p {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
         flex: 1;
         min-width: 0;
     }
     
-    .top-bar-left p {
-        display: none;
-    }
-    
     .top-bar-right {
-        flex-shrink: 0;
+        width: 100%;
         justify-content: flex-end;
-        margin-top: 0;
+        margin-top: 10px;
     }
     
     .language-menu-dropdown {
