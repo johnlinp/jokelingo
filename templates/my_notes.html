@@ -7,6 +7,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex">
     <title>{% trans "My Notes" %} - Jokelingo</title>
+    <link rel="canonical" href="{{ canonical_url }}">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ canonical_url }}">
+    <meta property="og:title" content="{% trans 'My Notes' %} - Jokelingo">
+    <meta property="og:description" content="{% trans 'Posts you\'ve marked as helpful' %}">
+    <meta property="og:site_name" content="Jokelingo">
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:url" content="{{ canonical_url }}">
+    <meta name="twitter:title" content="{% trans 'My Notes' %} - Jokelingo">
+    <meta name="twitter:description" content="{% trans 'Posts you\'ve marked as helpful' %}">
+    
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="icon" href="{% static 'images/favicon.ico' %}">
 </head>

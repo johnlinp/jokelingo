@@ -41,8 +41,10 @@ def login_view(request):
         return redirect(next_url, permanent=False)
     
     # Pass next parameter to template so it can be included in OAuth link
+    canonical_url = request.build_absolute_uri('/login/')
     context = {
-        'next': request.GET.get('next', '')
+        'next': request.GET.get('next', ''),
+        'canonical_url': canonical_url,
     }
     return render(request, 'login.html', context)
 
@@ -53,7 +55,11 @@ def my_notes_view(request):
         # Redirect to login with next parameter
         return redirect(f'/login/?next=/me/notes/', permanent=False)
     
-    return render(request, 'my_notes.html')
+    canonical_url = request.build_absolute_uri('/me/notes/')
+    context = {
+        'canonical_url': canonical_url,
+    }
+    return render(request, 'my_notes.html', context)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
