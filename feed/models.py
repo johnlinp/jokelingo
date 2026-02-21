@@ -158,16 +158,6 @@ class EngagementEvent(models.Model):
         return f"{self.user} -> {self.post}: {self.engagement_type}"
 
 
-class AnalyticsEventType(models.TextChoices):
-    """Analytics event type enum."""
-    ENGAGEMENT_CLICK_ANON = 'engagement_click_anon', 'Engagement Click (Anonymous)'
-    LOGIN_CLICK_TOPRIGHT_ANON = 'login_click_topright_anon', 'Login Click Top-Right (Anonymous)'
-    LOAD_MORE_CLICK = 'load_more_click', 'Load More Click'
-    PAGE_LANDING = 'page_landing', 'Page Landing'
-    LANGUAGE_MENU_EXPAND = 'language_menu_expand', 'Language Menu Expand'
-    LOGIN_MODAL_CLOSE = 'login_modal_close', 'Login Modal Close'
-
-
 class AnalyticsEvent(models.Model):
     """
     Analytics event model for tracking user interactions.
@@ -179,7 +169,6 @@ class AnalyticsEvent(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     event_type = models.CharField(
         max_length=50,
-        choices=AnalyticsEventType.choices,
         db_index=True
     )
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
