@@ -2,6 +2,8 @@
 
 Jokelingo is a platform for learning a new language while having fun.
 
+Website: https://www.jokelingo.com/
+
 ## Prerequisites
 
 - Python 3.8 or higher
