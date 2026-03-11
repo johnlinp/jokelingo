@@ -10,7 +10,9 @@ from .models import Post, User, EngagementEvent, AnalyticsEvent
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
     """Admin interface for Post model."""
-    
+
+    ordering = ['-created_at']
+
     list_display = [
         'id',
         'source_provider',
