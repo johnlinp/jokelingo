@@ -16,7 +16,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 msgid "Laugh in every language"
-msgstr "跨語言大笑"
+msgstr "用各種語言大笑"
 
 msgid "Spanish → English"
 msgstr "西班牙文 → 英文"
