@@ -15,8 +15,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-msgid "Laugh in every langauge"
-msgstr "Laugh in every langauge"
+msgid "Laugh in every language"
+msgstr "Laugh in every language"
 
 msgid "Spanish → English"
 msgstr "Spanish → English"
