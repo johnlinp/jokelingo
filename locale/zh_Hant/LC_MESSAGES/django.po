@@ -15,8 +15,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-msgid "Learn a new language while having fun"
-msgstr "放鬆時學習新語言"
+msgid "Laugh in every langauge"
+msgstr "跨語言大笑"
 
 msgid "Spanish → English"
 msgstr "西班牙文 → 英文"
