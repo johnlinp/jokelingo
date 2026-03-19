@@ -179,12 +179,67 @@ function embedPost(post) {
     const provider = post.source.provider.toLowerCase();
     const url = post.source.canonical_url;
     
-    // Clear loading message
     const loadingDiv = embedContainer.querySelector('.embed-loading');
+
+    function waitForEmbedReady(wrapper, isReady) {
+        let settled = false;
+        let observer = null;
+
+        wrapper.style.visibility = 'hidden';
+        wrapper.style.pointerEvents = 'none';
+
+        function revealEmbed() {
+            if (settled || !isReady()) {
+                return false;
+            }
+
+            settled = true;
+            if (observer) observer.disconnect();
+
+            wrapper.style.visibility = '';
+            wrapper.style.pointerEvents = '';
+            if (loadingDiv) {
+                loadingDiv.remove();
+            }
+            return true;
+        }
+
+        function watchIframeLoads(root) {
+            if (!root || root.nodeType !== Node.ELEMENT_NODE) return;
+
+            if (root.tagName === 'IFRAME') {
+                root.addEventListener('load', revealEmbed, { once: true });
+            }
+
+            root.querySelectorAll('iframe').forEach((iframe) => {
+                iframe.addEventListener('load', revealEmbed, { once: true });
+            });
+        }
+
+        observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                mutation.addedNodes.forEach((node) => {
+                    watchIframeLoads(node);
+                });
+            });
+            revealEmbed();
+        });
+
+        observer.observe(wrapper, {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            characterData: true,
+        });
+
+        watchIframeLoads(wrapper);
+        requestAnimationFrame(revealEmbed);
+    }
     
     if (provider === 'reddit') {
         // Reddit embed using official embed script
         const wrapper = document.createElement('div');
+        wrapper.className = 'embed-wrapper';
         wrapper.style.textAlign = 'center';
         wrapper.style.width = '100%';
         
@@ -201,26 +256,8 @@ function embedPost(post) {
         
         wrapper.appendChild(blockquote);
         embedContainer.appendChild(wrapper);
-        
-        // Function to hide loading when Reddit embed is ready
-        let checkCount = 0;
-        const maxChecks = 20; // Stop checking after 10 seconds
-        function hideRedditLoading() {
-            if (loadingDiv && checkCount < maxChecks) {
-                checkCount++;
-                // Check if Reddit has rendered the embed (look for iframe)
-                const redditIframe = wrapper.querySelector('iframe') || blockquote.querySelector('iframe');
-                if (redditIframe) {
-                    loadingDiv.remove();
-                } else {
-                    // Check again after a short delay
-                    setTimeout(hideRedditLoading, 500);
-                }
-            } else if (loadingDiv && checkCount >= maxChecks) {
-                // Timeout - remove loading anyway
-                loadingDiv.remove();
-            }
-        }
+
+        waitForEmbedReady(wrapper, () => Boolean(wrapper.querySelector('iframe')));
         
         // Load Reddit embed script if not already loaded
         const existingScript = document.querySelector('script[src*="embed.reddit.com/widgets.js"]');
@@ -229,10 +266,6 @@ function embedPost(post) {
             script.src = 'https://embed.reddit.com/widgets.js';
             script.async = true;
             script.charset = 'UTF-8';
-            script.onload = () => {
-                // Start checking immediately
-                setTimeout(hideRedditLoading, 500);
-            };
             document.body.appendChild(script);
         } else {
             // Script already loaded - Reddit's embed script needs to process new embeds
@@ -249,16 +282,13 @@ function embedPost(post) {
             newScript.async = true;
             newScript.charset = 'UTF-8';
             newScript.setAttribute('data-reddit-embed-helper', 'true');
-            newScript.onload = () => {
-                // Start checking for the iframe after script loads
-                setTimeout(hideRedditLoading, 500);
-            };
             // Append the new script - it will process the new embed
             document.body.appendChild(newScript);
         }
     } else if (provider === 'instagram') {
         // Instagram embed using blockquote (works with their embed.js)
         const wrapper = document.createElement('div');
+        wrapper.className = 'embed-wrapper';
         wrapper.style.textAlign = 'center';
         wrapper.style.width = '100%';
         const blockquote = document.createElement('blockquote');
@@ -275,45 +305,26 @@ function embedPost(post) {
         
         wrapper.appendChild(blockquote);
         embedContainer.appendChild(wrapper);
-        
-        // Function to hide loading when embed is ready
-        let checkCount = 0;
-        const maxChecks = 20; // Stop checking after 10 seconds
-        function hideInstagramLoading() {
-            if (loadingDiv && checkCount < maxChecks) {
-                checkCount++;
-                // Check if Instagram has rendered the embed - look in wrapper or blockquote
-                const instagramIframe = wrapper.querySelector('iframe') || blockquote.querySelector('iframe');
-                const hasContent = blockquote.children.length > 0 && blockquote.innerHTML.length > 200;
-                if (instagramIframe || hasContent) {
-                    loadingDiv.remove();
-                } else {
-                    // Check again after a short delay
-                    setTimeout(hideInstagramLoading, 500);
-                }
-            } else if (loadingDiv && checkCount >= maxChecks) {
-                // Timeout - remove loading anyway
-                loadingDiv.remove();
-            }
-        }
+
+        waitForEmbedReady(wrapper, () => {
+            const instagramIframe = wrapper.querySelector('iframe') || blockquote.querySelector('iframe');
+            const hasContent = blockquote.children.length > 0 && blockquote.innerHTML.length > 200;
+            return Boolean(instagramIframe || hasContent);
+        });
         
         // Load Instagram embed script if not already loaded
         if (!window.instgrm) {
             const script = document.createElement('script');
             script.src = 'https://www.instagram.com/embed.js';
             script.async = true;
-            script.onload = () => {
-                // Start checking immediately and continue
-                setTimeout(hideInstagramLoading, 500);
-            };
             document.body.appendChild(script);
         } else {
             window.instgrm.Embeds.process();
-            setTimeout(hideInstagramLoading, 500);
         }
     } else if (provider === 'twitter') {
         // Twitter embed using blockquote (works with their widgets.js)
         const wrapper = document.createElement('div');
+        wrapper.className = 'embed-wrapper';
         wrapper.style.textAlign = 'center';
         wrapper.style.width = '100%';
         const blockquote = document.createElement('blockquote');
@@ -325,28 +336,13 @@ function embedPost(post) {
         
         wrapper.appendChild(blockquote);
         embedContainer.appendChild(wrapper);
-        
-        // Function to hide loading when Twitter embed is ready
-        let checkCount = 0;
-        const maxChecks = 20; // Stop checking after 10 seconds
-        function hideTwitterLoading() {
-            if (loadingDiv && checkCount < maxChecks) {
-                checkCount++;
-                // Check if Twitter has rendered the embed (look for iframe or rendered content)
-                const twitterIframe = wrapper.querySelector('iframe') || blockquote.querySelector('iframe');
-                const twitterRendered = wrapper.querySelector('.twitter-tweet-rendered') || blockquote.querySelector('.twitter-tweet-rendered');
-                const hasContent = blockquote.innerHTML.length > link.outerHTML.length + 50;
-                if (twitterIframe || twitterRendered || hasContent) {
-                    loadingDiv.remove();
-                } else {
-                    // Check again after a short delay
-                    setTimeout(hideTwitterLoading, 500);
-                }
-            } else if (loadingDiv && checkCount >= maxChecks) {
-                // Timeout - remove loading anyway
-                loadingDiv.remove();
-            }
-        }
+
+        waitForEmbedReady(wrapper, () => {
+            const twitterIframe = wrapper.querySelector('iframe') || blockquote.querySelector('iframe');
+            const twitterRendered = wrapper.querySelector('.twitter-tweet-rendered') || blockquote.querySelector('.twitter-tweet-rendered');
+            const hasContent = blockquote.innerHTML.length > link.outerHTML.length + 50;
+            return Boolean(twitterIframe || twitterRendered || hasContent);
+        });
         
         // Load Twitter embed script if not already loaded
         if (!window.twttr) {
@@ -358,18 +354,16 @@ function embedPost(post) {
             script.onload = () => {
                 if (window.twttr && window.twttr.widgets) {
                     window.twttr.widgets.load();
-                    // Start checking immediately
-                    setTimeout(hideTwitterLoading, 1000);
                 }
             };
             document.body.appendChild(script);
         } else {
             window.twttr.widgets.load();
-            setTimeout(hideTwitterLoading, 1000);
         }
     } else if (provider === 'imgur') {
         // Imgur embed using blockquote (works with their embed.js)
         const wrapper = document.createElement('div');
+        wrapper.className = 'embed-wrapper';
         wrapper.style.textAlign = 'center';
         wrapper.style.width = '100%';
         
@@ -388,37 +382,20 @@ function embedPost(post) {
         
         wrapper.appendChild(blockquote);
         embedContainer.appendChild(wrapper);
-        
-        // Function to hide loading when embed is ready
-        let checkCount = 0;
-        const maxChecks = 20;
-        function hideImgurLoading() {
-            if (loadingDiv && checkCount < maxChecks) {
-                checkCount++;
-                const imgurIframe = wrapper.querySelector('iframe');
-                if (imgurIframe) {
-                    loadingDiv.remove();
-                } else {
-                    setTimeout(hideImgurLoading, 500);
-                }
-            } else if (loadingDiv) {
-                loadingDiv.remove();
-            }
-        }
+
+        waitForEmbedReady(wrapper, () => Boolean(wrapper.querySelector('iframe')));
         
         // Load Imgur embed script if not already loaded
         if (!document.querySelector('script[src*="s.imgur.com/min/embed.js"]')) {
             const script = document.createElement('script');
             script.src = 'https://s.imgur.com/min/embed.js';
             script.async = true;
-            script.onload = () => setTimeout(hideImgurLoading, 500);
             document.body.appendChild(script);
-        } else {
-            setTimeout(hideImgurLoading, 500);
         }
     } else if (provider === 'facebook') {
         // Facebook embed using fb-post div (works with their SDK)
         const wrapper = document.createElement('div');
+        wrapper.className = 'embed-wrapper';
         wrapper.style.textAlign = 'center';
         wrapper.style.width = '100%';
         
@@ -430,26 +407,12 @@ function embedPost(post) {
         
         wrapper.appendChild(fbPost);
         embedContainer.appendChild(wrapper);
-        
-        // Function to hide loading when embed is ready
-        let checkCount = 0;
-        const maxChecks = 20;
-        function hideFacebookLoading() {
-            if (loadingDiv && checkCount < maxChecks) {
-                checkCount++;
-                // Check if Facebook has rendered the embed (look for iframe or rendered content)
-                const fbIframe = wrapper.querySelector('iframe');
-                const hasContent = fbPost.children.length > 0 && fbPost.innerHTML.length > 200;
-                if (fbIframe || hasContent) {
-                    loadingDiv.remove();
-                } else {
-                    setTimeout(hideFacebookLoading, 500);
-                }
-            } else if (loadingDiv && checkCount >= maxChecks) {
-                // Timeout - remove loading anyway
-                loadingDiv.remove();
-            }
-        }
+
+        waitForEmbedReady(wrapper, () => {
+            const fbIframe = wrapper.querySelector('iframe');
+            const hasContent = fbPost.children.length > 0 && fbPost.innerHTML.length > 200;
+            return Boolean(fbIframe || hasContent);
+        });
         
         // Load Facebook SDK if not already loaded
         if (!window.FB) {
@@ -462,14 +425,12 @@ function embedPost(post) {
             script.onload = () => {
                 if (window.FB) {
                     window.FB.XFBML.parse(wrapper);
-                    setTimeout(hideFacebookLoading, 1000);
                 }
             };
             document.body.appendChild(script);
         } else {
             // SDK already loaded - parse new embed
             window.FB.XFBML.parse(wrapper);
-            setTimeout(hideFacebookLoading, 1000);
         }
     } else {
         // Fallback: show link
