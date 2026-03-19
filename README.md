@@ -27,15 +27,20 @@ Website: https://www.jokelingo.com/
    pip3 install -r requirements.txt
    ```
 
-4. **Run database migrations:**
+4. **Set environment variables for local development:**
+   ```bash
+   export DEBUG=True
+   export DATABASE_URL=postgresql://postgres:secret123@localhost:5432/postgres
+   ```
+
+5. **Run database migrations:**
    ```bash
    python3 manage.py migrate
    ```
 
-5. **Set environment variables for local development:**
+6. **Create a superuser:**
    ```bash
-   export DEBUG=True
-   export DATABASE_URL=postgresql://postgres:secret123@localhost:5432/postgres
+   python manage.py createsuperuser
    ```
 
 ## Running the Server
