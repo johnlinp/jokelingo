@@ -153,15 +153,15 @@ function renderPost(post, options = {}) {
                     <h4>${t('Explanation')}</h4>
                     <div class="explanation">${post.contribution.explanation.text}</div>
                 ` : ''}
-            </div>
-            <div class="post-engagement">
-                <div class="engagement-item helpful${helpfulActive} clickable" data-engagement-type="helpful" data-post-id="${post.id}">
-                    <span>👍</span>
-                    <span class="engagement-count">${post.engagement.helpful}</span> <span class="engagement-label">${t('helpful')}</span>
-                </div>
-                <div class="engagement-item confusing${confusingActive} clickable" data-engagement-type="confusing" data-post-id="${post.id}">
-                    <span>😕</span>
-                    <span class="engagement-count">${post.engagement.confusing}</span> <span class="engagement-label">${t('confusing')}</span>
+                <div class="post-engagement">
+                    <div class="engagement-item helpful${helpfulActive} clickable" data-engagement-type="helpful" data-post-id="${post.id}">
+                        <span>👍</span>
+                        <span class="engagement-count">${post.engagement.helpful}</span> <span class="engagement-label">${t('helpful')}</span>
+                    </div>
+                    <div class="engagement-item confusing${confusingActive} clickable" data-engagement-type="confusing" data-post-id="${post.id}">
+                        <span>😕</span>
+                        <span class="engagement-count">${post.engagement.confusing}</span> <span class="engagement-label">${t('confusing')}</span>
+                    </div>
                 </div>
             </div>
             <div class="post-author">
