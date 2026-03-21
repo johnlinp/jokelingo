@@ -142,7 +142,6 @@ function renderPost(post, options = {}) {
     return `
         <div class="post-card" data-post-id="${post.id}">
             <div class="post-embed" id="embed-${post.id}">
-                <div class="provider-badge">${post.source.provider}</div>
                 <div class="embed-loading">${t('Loading embedded post...')}</div>
             </div>
             <div class="post-contribution">
