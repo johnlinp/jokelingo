@@ -672,6 +672,8 @@ body {
     padding: 15px;
     border-radius: 5px;
     margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
 }
 
 @media (min-width: 769px) {
@@ -679,6 +681,7 @@ body {
         grid-column: 2;
         margin-bottom: 0;
         align-self: stretch;
+        justify-content: flex-end;
     }
 }
 
