@@ -121,7 +121,13 @@ function showError(message) {
 
 function formatDate(dateString) {
     const date = new Date(dateString);
-    return date.toLocaleString();
+    return date.toLocaleString([], {
+        year: 'numeric',
+        month: 'numeric',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+    });
 }
 
 // Render post function - can be customized per page
