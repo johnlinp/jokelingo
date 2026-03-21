@@ -705,6 +705,21 @@ body {
     white-space: pre-line;
 }
 
+.post-contribution .explanation-toggle {
+    margin-bottom: 10px;
+}
+
+.post-contribution .explanation-toggle summary {
+    color: #4a5568;
+    cursor: pointer;
+    font-style: italic;
+    user-select: none;
+}
+
+.post-contribution .explanation-toggle[open] summary {
+    display: none;
+}
+
 .post-engagement {
     display: flex;
     gap: 20px;

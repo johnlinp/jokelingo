@@ -156,8 +156,11 @@ function renderPost(post, options = {}) {
                     <div class="translation">${post.contribution.translation.text}</div>
                 ` : ''}
                 ${post.contribution?.explanation?.text ? `
-                    <h4>${t('Explanation')}</h4>
-                    <div class="explanation">${post.contribution.explanation.text}</div>
+                    <h4>${t('Why is it funny?')}</h4>
+                    <details class="explanation-toggle">
+                        <summary>${t('click me')}</summary>
+                        <div class="explanation">${post.contribution.explanation.text}</div>
+                    </details>
                 ` : ''}
                 <div class="post-engagement">
                     <div class="engagement-item helpful${helpfulActive} clickable" data-engagement-type="helpful" data-post-id="${post.id}">

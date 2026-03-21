@@ -84,8 +84,11 @@ msgstr "點擊貼文上的 \"有幫助\" 就可以存在這裡"
 msgid "Translation"
 msgstr "翻譯"
 
-msgid "Explanation"
-msgstr "解釋"
+msgid "Why is it funny?"
+msgstr "這有什麼好笑？"
+
+msgid "click me"
+msgstr "點我"
 
 msgid "helpful"
 msgstr "有幫助"

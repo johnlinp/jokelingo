@@ -84,8 +84,11 @@ msgstr "Click Helpful on a post to save it here."
 msgid "Translation"
 msgstr "Translation"
 
-msgid "Explanation"
-msgstr "Explanation"
+msgid "Why is it funny?"
+msgstr "Why is it funny?"
+
+msgid "click me"
+msgstr "click me"
 
 msgid "helpful"
 msgstr "helpful"
