@@ -8,6 +8,7 @@ Website: https://www.jokelingo.com/
 
 - Python 3.8 or higher
 - Pip (Python package manager)
+- Gettext utilities (`msgfmt`) for compiling localization files
 
 ## Setup
 
@@ -38,7 +39,12 @@ Website: https://www.jokelingo.com/
    python3 manage.py migrate
    ```
 
-6. **Create a superuser:**
+6. **Compile localization files:**
+   ```bash
+   python3 manage.py compilemessages
+   ```
+
+7. **Create a superuser:**
    ```bash
    python manage.py createsuperuser
    ```
