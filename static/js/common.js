@@ -190,7 +190,7 @@ function renderPost(post, options = {}) {
                 ${post.contribution?.explanation?.text ? `
                     <h4>${t('Why is it funny?')}</h4>
                     <details class="explanation-toggle">
-                        <summary>${t('click me')}</summary>
+                        <summary class="explanation-summary">${t('click me')}</summary>
                         <div class="explanation">${post.contribution.explanation.text}</div>
                     </details>
                 ` : ''}
@@ -692,6 +692,25 @@ function attachEngagementHandlers() {
         item.parentNode.replaceChild(newItem, item);
         // Add click listener
         newItem.addEventListener('click', handleEngagementClick);
+    });
+}
+
+function attachExplanationHandlers() {
+    const explanationSummaries = document.querySelectorAll('.explanation-summary');
+    explanationSummaries.forEach(summary => {
+        if (summary.dataset.analyticsBound === 'true') {
+            return;
+        }
+
+        summary.dataset.analyticsBound = 'true';
+        summary.addEventListener('click', () => {
+            const postCard = summary.closest('.post-card');
+            const postId = postCard ? postCard.dataset.postId : null;
+
+            trackAnalyticsEvent('why_is_it_funny_click', {
+                post_id: postId
+            });
+        });
     });
 }
 

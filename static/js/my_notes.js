@@ -54,6 +54,7 @@ function initMyNotesPage(config) {
                 }
                 // Attach engagement click handlers
                 attachEngagementHandlers();
+                attachExplanationHandlers();
             } else {
                 if (!append) {
                     // Show empty state
