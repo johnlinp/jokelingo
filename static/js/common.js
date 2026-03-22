@@ -119,15 +119,47 @@ function showError(message) {
     if (loading) loading.style.display = 'none';
 }
 
+function getDjangoLanguage() {
+    const htmlLang = document.documentElement.lang || 'en';
+    return htmlLang.replace('_', '-');
+}
+
 function formatDate(dateString) {
     const date = new Date(dateString);
-    return date.toLocaleString([], {
-        year: 'numeric',
-        month: 'numeric',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
+    const diffMs = date.getTime() - Date.now();
+
+    if (Number.isNaN(date.getTime())) {
+        return dateString;
+    }
+
+    const absDiffMs = Math.abs(diffMs);
+    const minuteMs = 60 * 1000;
+    const hourMs = 60 * minuteMs;
+    const dayMs = 24 * hourMs;
+    const monthMs = 30 * dayMs;
+    const yearMs = 365 * dayMs;
+
+    if (absDiffMs < minuteMs) {
+        return diffMs < 0 ? 'a moment ago' : 'in a moment';
+    }
+
+    const rtf = new Intl.RelativeTimeFormat(getDjangoLanguage(), {
+        numeric: 'auto',
     });
+
+    if (absDiffMs < hourMs) {
+        return rtf.format(Math.round(diffMs / minuteMs), 'minute');
+    }
+    if (absDiffMs < dayMs) {
+        return rtf.format(Math.round(diffMs / hourMs), 'hour');
+    }
+    if (absDiffMs < monthMs) {
+        return rtf.format(Math.round(diffMs / dayMs), 'day');
+    }
+    if (absDiffMs < yearMs) {
+        return rtf.format(Math.round(diffMs / monthMs), 'month');
+    }
+    return rtf.format(Math.round(diffMs / yearMs), 'year');
 }
 
 // Render post function - can be customized per page
