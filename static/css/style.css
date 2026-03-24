@@ -142,7 +142,7 @@ body {
     background: white;
     border-radius: 5px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    min-width: 120px;
+    min-width: 180px;
     z-index: 1000;
     overflow: hidden;
 }
@@ -157,6 +157,7 @@ body {
     color: #4a5568;
     text-decoration: none;
     font-size: 0.9em;
+    white-space: nowrap;
     transition: background-color 0.2s;
 }
 

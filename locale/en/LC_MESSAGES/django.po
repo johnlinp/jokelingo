@@ -36,8 +36,8 @@ msgstr "Spanish → Traditional Chinese"
 msgid "More Languages"
 msgstr "More Languages"
 
-msgid "My Notes"
-msgstr "My Notes"
+msgid "My Collection"
+msgstr "My Collection"
 
 msgid "Logout"
 msgstr "Logout"
@@ -57,8 +57,8 @@ msgstr "Continue with Google"
 msgid "Loading feed..."
 msgstr "Loading feed..."
 
-msgid "Loading notes..."
-msgstr "Loading notes..."
+msgid "Loading collection..."
+msgstr "Loading collection..."
 
 msgid "Posts you've marked as helpful"
 msgstr "Posts you've marked as helpful"
@@ -75,8 +75,8 @@ msgstr "Load More"
 msgid "Error loading feed:"
 msgstr "Error loading feed:"
 
-msgid "Error loading notes:"
-msgstr "Error loading notes:"
+msgid "Error loading collection:"
+msgstr "Error loading collection:"
 
 msgid "Click Helpful on a post to save it here."
 msgstr "Click Helpful on a post to save it here."
@@ -102,8 +102,8 @@ msgstr "By"
 msgid "Loading embedded post..."
 msgstr "Loading embedded post..."
 
-msgid "You haven't added any notes yet."
-msgstr "You haven't added any notes yet."
+msgid "You haven't added anything to your collection yet."
+msgstr "You haven't added anything to your collection yet."
 
 msgid "Korean"
 msgstr "Korean"

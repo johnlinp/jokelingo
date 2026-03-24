@@ -97,7 +97,7 @@ def generate_cursor(created_at_str):
 
 
 def generate_cursor_from_updated_at(updated_at_str):
-    """Generate cursor from updated_at timestamp for notes pagination."""
+    """Generate cursor from updated_at timestamp for collection pagination."""
     cursor_data = {
         "updated_at": updated_at_str
     }
@@ -310,11 +310,11 @@ class FeedView(APIView):
         return Response(response_data, status=status.HTTP_200_OK)
 
 
-class MyNotesView(APIView):
+class MyCollectionView(APIView):
     """
-    API endpoint for fetching user's notes (posts marked as helpful).
+    API endpoint for fetching the user's collection (posts marked as helpful).
     
-    GET /api/v1/me/notes/
+    GET /api/v1/me/collection/
     
     Query parameters:
     - limit: Number of posts to return (default: 10)

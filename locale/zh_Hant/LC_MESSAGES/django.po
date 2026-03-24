@@ -36,8 +36,8 @@ msgstr "西班牙文 → 正體中文"
 msgid "More Languages"
 msgstr "更多語言"
 
-msgid "My Notes"
-msgstr "我的筆記"
+msgid "My Collection"
+msgstr "我的收藏"
 
 msgid "Logout"
 msgstr "登出"
@@ -57,8 +57,8 @@ msgstr "使用 Google 繼續"
 msgid "Loading feed..."
 msgstr "載入動態消息中..."
 
-msgid "Loading notes..."
-msgstr "載入筆記中..."
+msgid "Loading collection..."
+msgstr "載入收藏中..."
 
 msgid "Posts you've marked as helpful"
 msgstr "您標記為有幫助的貼文"
@@ -75,8 +75,8 @@ msgstr "載入更多"
 msgid "Error loading feed:"
 msgstr "載入動態時發生錯誤："
 
-msgid "Error loading notes:"
-msgstr "載入筆記時發生錯誤："
+msgid "Error loading collection:"
+msgstr "載入收藏時發生錯誤："
 
 msgid "Click Helpful on a post to save it here."
 msgstr "點擊貼文上的 \"有幫助\" 就可以存在這裡"
@@ -102,8 +102,8 @@ msgstr "由"
 msgid "Loading embedded post..."
 msgstr "載入嵌入貼文中..."
 
-msgid "You haven't added any notes yet."
-msgstr "您尚未新增任何筆記"
+msgid "You haven't added anything to your collection yet."
+msgstr "您尚未將任何內容加入收藏"
 
 msgid "Korean"
 msgstr "韓文"

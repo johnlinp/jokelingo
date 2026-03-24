@@ -1,7 +1,7 @@
-// Page-specific JavaScript for my_notes.html
+// Page-specific JavaScript for the My Collection page
 
 // Initialize the page
-function initMyNotesPage(config) {
+function initMyCollectionPage(config) {
     const { isAuthenticated } = config;
     
     // Set as global variable for common.js to access
@@ -12,7 +12,7 @@ function initMyNotesPage(config) {
     const postsContainer = document.getElementById('postsContainer');
     const pagination = document.getElementById('pagination');
     
-    async function loadNotes(cursor = null, append = false) {
+    async function loadCollection(cursor = null, append = false) {
         showLoading(append);
         
         const queryParams = new URLSearchParams();
@@ -20,11 +20,11 @@ function initMyNotesPage(config) {
         if (cursor) queryParams.append('cursor', cursor);
         
         try {
-            const response = await fetch(`/api/v1/me/notes?${queryParams.toString()}`);
+            const response = await fetch(`/api/v1/me/collection?${queryParams.toString()}`);
             
             if (response.status === 401) {
                 // User is not authenticated, redirect to login
-                window.location.href = '/login/?next=/me/notes/';
+                window.location.href = '/login/?next=/me/collection/';
                 return;
             }
             
@@ -61,7 +61,7 @@ function initMyNotesPage(config) {
                     postsContainer.innerHTML = `
                         <div class="post-card" style="text-align: center; padding: 40px;">
                             <p style="font-size: 1.1em; color: #4a5568; margin-bottom: 10px;">
-                                ${t('You haven\'t added any notes yet.')}
+                                ${t('You haven\'t added anything to your collection yet.')}
                             </p>
                             <p style="color: #718096;">
                                 ${t('Click Helpful on a post to save it here.')}
@@ -84,7 +84,7 @@ function initMyNotesPage(config) {
             
             hideLoading();
         } catch (err) {
-            showError(`${t('Error loading notes:')} ${err.message}`);
+            showError(`${t('Error loading collection:')} ${err.message}`);
         }
     }
     
@@ -92,16 +92,16 @@ function initMyNotesPage(config) {
         // Track analytics event for load more click
         trackAnalyticsEvent('load_more_click', {
             page_cursor: currentCursor || null,
-            page_type: 'my_notes'
+            page_type: 'my_collection'
         });
         
-        loadNotes(currentCursor, true); // true = append mode
+        loadCollection(currentCursor, true); // true = append mode
     }
     
     // Set up error handler for engagement submission (don't reload on error)
     setEngagementErrorHandler({
         on401: () => {
-            window.location.href = '/login/?next=/me/notes/';
+            window.location.href = '/login/?next=/me/collection/';
         },
         onError: (err) => {
             // On error, don't refresh - just log the error
@@ -111,20 +111,20 @@ function initMyNotesPage(config) {
     
     // Set up unauthenticated handler (redirect to login)
     setEngagementUnauthenticatedHandler(() => {
-        window.location.href = '/login/?next=/me/notes/';
+        window.location.href = '/login/?next=/me/collection/';
     });
     
     // Make functions available globally for onclick handlers
     window.loadNextPage = loadNextPage;
     
-    // Load initial notes on page load
+    // Load initial collection items on page load
     window.addEventListener('DOMContentLoaded', () => {
         // Track page landing event
         trackAnalyticsEvent('page_landing', {
             path: window.location.pathname
         });
         
-        loadNotes();
+        loadCollection();
         initUserMenu();
     });
 }

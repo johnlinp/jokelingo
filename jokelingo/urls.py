@@ -48,25 +48,25 @@ def login_view(request):
     }
     return render(request, 'login.html', context)
 
-def my_notes_view(request):
-    """View that renders the My Notes page."""
+def my_collection_view(request):
+    """View that renders the My Collection page."""
     # Check authentication
     if not request.user.is_authenticated:
         # Redirect to login with next parameter
-        return redirect(f'/login/?next=/me/notes/', permanent=False)
+        return redirect('/login/?next=/me/collection/', permanent=False)
     
-    canonical_url = request.build_absolute_uri('/me/notes/')
+    canonical_url = request.build_absolute_uri('/me/collection/')
     context = {
         'canonical_url': canonical_url,
     }
-    return render(request, 'my_notes.html', context)
+    return render(request, 'my_collection.html', context)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("accounts/", include("allauth.urls")),
     path('api/v1/', include('feed.urls')),
     path('login/', login_view, name='login'),
-    path('me/notes/', my_notes_view, name='my_notes'),
+    path('me/collection/', my_collection_view, name='my_collection'),
     path('es/en/', lambda request: language_feed_view(request, 'es', 'en'), name='es_en_index'),
     path('fr/en/', lambda request: language_feed_view(request, 'fr', 'en'), name='fr_en_index'),
     path('ko/en/', lambda request: language_feed_view(request, 'ko', 'en'), name='ko_en_index'),

@@ -6,20 +6,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex">
-    <title>{% trans "My Notes" %} - Jokelingo</title>
+    <title>{% trans "My Collection" %} - Jokelingo</title>
     <link rel="canonical" href="{{ canonical_url }}">
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ canonical_url }}">
-    <meta property="og:title" content="{% trans 'My Notes' %} - Jokelingo">
+    <meta property="og:title" content="{% trans 'My Collection' %} - Jokelingo">
     <meta property="og:description" content="{% trans 'Posts you\'ve marked as helpful' %}">
     <meta property="og:site_name" content="Jokelingo">
     
     <!-- Twitter -->
     <meta name="twitter:card" content="summary">
     <meta name="twitter:url" content="{{ canonical_url }}">
-    <meta name="twitter:title" content="{% trans 'My Notes' %} - Jokelingo">
+    <meta name="twitter:title" content="{% trans 'My Collection' %} - Jokelingo">
     <meta name="twitter:description" content="{% trans 'Posts you\'ve marked as helpful' %}">
     
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
@@ -36,7 +36,7 @@
                 <div class="user-menu-container">
                     <div class="user-display-name" id="userMenuTrigger">{{ user.display_name }}</div>
                     <div class="user-menu-dropdown" id="userMenuDropdown">
-                        <a href="/me/notes/" class="user-menu-item">{% trans "My Notes" %}</a>
+                        <a href="/me/collection/" class="user-menu-item">{% trans "My Collection" %}</a>
                         <a href="/accounts/logout/" class="user-menu-item">{% trans "Logout" %}</a>
                     </div>
                 </div>
@@ -48,13 +48,13 @@
     
     <div class="container">
         <div class="page-header" style="margin-bottom: 20px;">
-            <h2 style="margin: 0; color: #2d3748;">{% trans "My Notes" %}</h2>
+            <h2 style="margin: 0; color: #2d3748;">{% trans "My Collection" %}</h2>
             <p style="margin: 10px 0 0 0; color: #4a5568;">{% trans "Posts you've marked as helpful" %}</p>
         </div>
         
         <div id="error" style="display: none;" class="error"></div>
         
-        <div id="loading" class="loading" style="display: none;">{% trans "Loading notes..." %}</div>
+        <div id="loading" class="loading" style="display: none;">{% trans "Loading collection..." %}</div>
         
         <div id="postsContainer" class="posts-container"></div>
         
@@ -62,14 +62,14 @@
     </div>
     
     <script src="{% static 'js/common.js' %}"></script>
-    <script src="{% static 'js/my_notes.js' %}"></script>
+    <script src="{% static 'js/my_collection.js' %}"></script>
     <script>
         // JavaScript translations based on current language
         {% trans "No posts found." as msg_no_posts %}
         {% trans "Load More" as msg_load_more %}
-        {% trans "Error loading notes:" as msg_error_notes %}
+        {% trans "Error loading collection:" as msg_error_collection %}
         {% trans "Click Helpful on a post to save it here." as msg_click_helpful %}
-        {% trans "You haven't added any notes yet." as msg_no_notes_yet %}
+        {% trans "You haven't added anything to your collection yet." as msg_no_collection_yet %}
         {% trans "Translation" as msg_translation %}
         {% trans "Why is it funny?" as msg_explanation %}
         {% trans "click me" as msg_click_to_reveal %}
@@ -85,9 +85,9 @@
         window.i18n = {
             'No posts found.': '{{ msg_no_posts|escapejs }}',
             'Load More': '{{ msg_load_more|escapejs }}',
-            'Error loading notes:': '{{ msg_error_notes|escapejs }}',
+            'Error loading collection:': '{{ msg_error_collection|escapejs }}',
             'Click Helpful on a post to save it here.': '{{ msg_click_helpful|escapejs }}',
-            'You haven\'t added any notes yet.': '{{ msg_no_notes_yet|escapejs }}',
+            'You haven\'t added anything to your collection yet.': '{{ msg_no_collection_yet|escapejs }}',
             'Translation': '{{ msg_translation|escapejs }}',
             'Why is it funny?': '{{ msg_explanation|escapejs }}',
             'click me': '{{ msg_click_to_reveal|escapejs }}',
@@ -103,7 +103,7 @@
         };
         
         // Initialize the page with Django template variables
-        initMyNotesPage({
+        initMyCollectionPage({
             isAuthenticated: {% if user.is_authenticated %}true{% else %}false{% endif %}
         });
     </script>
