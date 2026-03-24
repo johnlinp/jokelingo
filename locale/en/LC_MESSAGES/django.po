@@ -49,7 +49,7 @@ msgid "Login to Jokelingo"
 msgstr "Login to Jokelingo"
 
 msgid "Sign in to mark posts as helpful or confusing; and later, to create your own posts. We will never post anything on your behalf."
-msgstr "Sign in to mark posts as helpful or confusing; and later, to create your own posts. We will never post anything on your behalf."
+msgstr "Sign in to save posts or mark as confusing; and later, to create your own posts. We will never post anything on your behalf."
 
 msgid "Continue with Google"
 msgstr "Continue with Google"
@@ -61,7 +61,7 @@ msgid "Loading collection..."
 msgstr "Loading collection..."
 
 msgid "Posts you've marked as helpful"
-msgstr "Posts you've marked as helpful"
+msgstr "Posts you've saved"
 
 msgid "Back to home"
 msgstr "Back to home"
@@ -79,7 +79,7 @@ msgid "Error loading collection:"
 msgstr "Error loading collection:"
 
 msgid "Click Helpful on a post to save it here."
-msgstr "Click Helpful on a post to save it here."
+msgstr "Click \"Save\" on a post to save it here."
 
 msgid "Translation"
 msgstr "Translation"
@@ -91,10 +91,10 @@ msgid "click me"
 msgstr "click me"
 
 msgid "helpful"
-msgstr "helpful"
+msgstr "save"
 
 msgid "confusing"
-msgstr "confusing"
+msgstr "still confused"
 
 msgid "By"
 msgstr "By"
