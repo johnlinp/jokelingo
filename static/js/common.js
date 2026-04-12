@@ -333,7 +333,6 @@ function embedPost(post) {
         wrapper.style.width = '100%';
         const blockquote = document.createElement('blockquote');
         blockquote.className = 'instagram-media';
-        blockquote.setAttribute('data-instgrm-captioned', '');
         blockquote.setAttribute('data-instgrm-permalink', url);
         blockquote.setAttribute('data-instgrm-version', '14');
         blockquote.style.background = '#FFF';
