@@ -18,6 +18,9 @@ msgstr ""
 msgid "Laugh in every language"
 msgstr "用各種語言大笑"
 
+msgid "Discover jokes, puns, and wordplay from different languages with explanations and translations that help you understand why they are funny."
+msgstr "探索不同語言的笑話、雙關語和文字遊戲，搭配說明與翻譯，讓你搞懂笑點在哪。"
+
 msgid "Spanish → English"
 msgstr "西班牙文 → 英文"
 
