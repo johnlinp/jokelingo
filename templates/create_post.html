@@ -1,0 +1,163 @@
+{% load i18n %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE|default:'en' }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <title>{% trans "Create Post" %} - Jokelingo</title>
+    <link rel="canonical" href="{{ canonical_url }}">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ canonical_url }}">
+    <meta property="og:title" content="{% trans 'Create Post' %} - Jokelingo">
+    <meta property="og:description" content="{% trans 'Add a new joke post with translation and context.' %}">
+    <meta property="og:site_name" content="Jokelingo">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:url" content="{{ canonical_url }}">
+    <meta name="twitter:title" content="{% trans 'Create Post' %} - Jokelingo">
+    <meta name="twitter:description" content="{% trans 'Add a new joke post with translation and context.' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="icon" href="{% static 'images/favicon.ico' %}">
+</head>
+<body>
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <h1><a href="/">Jokelingo</a></h1>
+            <p>{% trans "Laugh in every language" %}</p>
+        </div>
+        <div class="top-bar-right">
+            {% if user.is_authenticated %}
+                <div class="user-menu-container">
+                    <div class="user-display-name" id="userMenuTrigger">{{ user.display_name }}</div>
+                    <div class="user-menu-dropdown" id="userMenuDropdown">
+                        <a href="/me/collection/" class="user-menu-item">{% trans "My Collection" %}</a>
+                        <a href="/accounts/logout/" class="user-menu-item">{% trans "Logout" %}</a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="container create-page-container">
+        <div class="create-page-grid">
+            <section class="create-panel">
+                <div class="create-panel-header">
+                    <h2>{% trans "Create a Post" %}</h2>
+                </div>
+
+                <div id="publishSuccess" class="create-success" style="display: none;"></div>
+
+                <form id="createPostForm" class="create-post-form" autocomplete="off">
+                    <div class="create-field">
+                        <label for="sourceRawUrl">{% trans "Source post URL" %}</label>
+                        <div class="source-url-input-row">
+                            <input id="sourceRawUrl" name="source_raw_url" type="url" placeholder="https://..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required>
+                        </div>
+                        <p id="sourceStatus" class="field-status"></p>
+                    </div>
+
+                    <div class="create-field-row">
+                        <div class="create-field language-summary-field">
+                            <label for="sourceLanguageCode">{% trans "Language" %}</label>
+                            <div class="language-summary-row">
+                                <select id="sourceLanguageCode" name="source_language_code">
+                                    <option value="es">{% trans "Spanish" %}</option>
+                                    <option value="fr">{% trans "French" %}</option>
+                                    <option value="ko">{% trans "Korean" %}</option>
+                                </select>
+                                <span>&rarr;</span>
+                                <select id="targetLanguageCode" name="target_language_code">
+                                    <option value="en">{% trans "English" %}</option>
+                                    <option value="zh-hant">{% trans "Traditional Chinese" %}</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="pairStatus" class="field-status"></div>
+                </form>
+            </section>
+
+            <aside class="preview-panel">
+                <div class="preview-panel-header">
+                    <h3>{% trans "Live Preview" %}</h3>
+                </div>
+                <div id="previewEmpty" class="preview-empty">
+                    <p>{% trans "Add a source URL to see a preview." %}</p>
+                </div>
+                <div id="previewContainer" class="posts-container" style="display: none;"></div>
+                <div id="previewContributionFields" class="preview-contribution-fields" style="display: none;">
+                    <div class="create-field">
+                        <label for="translationText">{% trans "Translation" %}</label>
+                        <textarea id="translationText" name="translation_text" rows="5"></textarea>
+                    </div>
+                    <div class="create-field">
+                        <label for="explanationText">{% trans "Why is it funny?" %}</label>
+                        <textarea id="explanationText" name="explanation_text" rows="6"></textarea>
+                    </div>
+                </div>
+            </aside>
+
+            <div id="publishError" class="error create-error-bottom" style="display: none;"></div>
+            <div class="create-actions create-actions-bottom">
+                <button id="publishBtn" class="btn" type="submit" form="createPostForm">{% trans "Publish Post" %}</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'js/common.js' %}"></script>
+    <script src="{% static 'js/create_post.js' %}"></script>
+    <script>
+        {% trans "Enter a supported source URL." as msg_source_needed %}
+        {% trans "That language pair is not supported yet." as msg_pair_bad %}
+        {% trans "Either translation or explanation is required." as msg_content_required %}
+        {% trans "Publish Post" as msg_publish_post %}
+        {% trans "Publishing..." as msg_publishing %}
+        {% trans "Post published successfully." as msg_publish_success %}
+        {% trans "Only Reddit, Instagram, X/Twitter, Imgur, and Facebook URLs are supported right now." as msg_supported_providers %}
+        {% trans "Add a source URL to see a preview." as msg_preview_empty %}
+        {% trans "Translation" as msg_translation %}
+        {% trans "Why is it funny?" as msg_explanation %}
+        {% trans "click me" as msg_click_to_reveal %}
+        {% trans "helpful" as msg_helpful %}
+        {% trans "confusing" as msg_confusing %}
+        {% trans "By" as msg_by %}
+        {% trans "Loading embedded post..." as msg_loading_embed %}
+        {% trans "Korean" as msg_korean %}
+        {% trans "Traditional Chinese" as msg_traditional_chinese %}
+        {% trans "Spanish" as msg_spanish %}
+        {% trans "English" as msg_english %}
+        {% trans "French" as msg_french %}
+        window.i18n = {
+            'Enter a supported source URL.': '{{ msg_source_needed|escapejs }}',
+            'That language pair is not supported yet.': '{{ msg_pair_bad|escapejs }}',
+            'Either translation or explanation is required.': '{{ msg_content_required|escapejs }}',
+            'Publish Post': '{{ msg_publish_post|escapejs }}',
+            'Publishing...': '{{ msg_publishing|escapejs }}',
+            'Post published successfully.': '{{ msg_publish_success|escapejs }}',
+            'Only Reddit, Instagram, X/Twitter, Imgur, and Facebook URLs are supported right now.': '{{ msg_supported_providers|escapejs }}',
+            'Add a source URL to see a preview.': '{{ msg_preview_empty|escapejs }}',
+            'Translation': '{{ msg_translation|escapejs }}',
+            'Why is it funny?': '{{ msg_explanation|escapejs }}',
+            'click me': '{{ msg_click_to_reveal|escapejs }}',
+            'helpful': '{{ msg_helpful|escapejs }}',
+            'confusing': '{{ msg_confusing|escapejs }}',
+            'By': '{{ msg_by|escapejs }}',
+            'Loading embedded post...': '{{ msg_loading_embed|escapejs }}',
+            'Korean': '{{ msg_korean|escapejs }}',
+            'Traditional Chinese': '{{ msg_traditional_chinese|escapejs }}',
+            'Spanish': '{{ msg_spanish|escapejs }}',
+            'English': '{{ msg_english|escapejs }}',
+            'French': '{{ msg_french|escapejs }}'
+        };
+
+        initCreatePostPage({
+            sourceLanguageCode: '{{ source_language_code }}',
+            targetLanguageCode: '{{ target_language_code }}',
+            authorId: '{{ user.id }}',
+            authorDisplayName: '{{ user.display_name|default:"Anonymous"|escapejs }}'
+        });
+    </script>
+</body>
+</html>

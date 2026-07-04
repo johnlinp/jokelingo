@@ -6,6 +6,15 @@ from django.urls import path, include
 from django.views.generic import TemplateView
 from django.shortcuts import redirect, render
 
+SUPPORTED_LANGUAGE_PATHS = {
+    '/es/en/': ('es', 'en'),
+    '/fr/en/': ('fr', 'en'),
+    '/ko/en/': ('ko', 'en'),
+    '/ko/zh-hant/': ('ko', 'zh-hant'),
+    '/es/zh-hant/': ('es', 'zh-hant'),
+}
+
+
 def language_feed_view(request, source_language_code, target_language_code):
     """View that renders the feed page with language-specific context."""
     canonical_url = request.build_absolute_uri(f'/{source_language_code}/{target_language_code}/')
@@ -28,7 +37,7 @@ def root_redirect_view(request):
     preferred_path = request.COOKIES.get('preferred_language_path', '/es/en/')
     
     # Validate that the preferred path is one of our valid language paths
-    if preferred_path not in ['/es/en/', '/fr/en/', '/ko/en/', '/ko/zh-hant/', '/es/zh-hant/']:
+    if preferred_path not in SUPPORTED_LANGUAGE_PATHS:
         preferred_path = '/es/en/'
     
     return redirect(preferred_path, permanent=False)
@@ -61,11 +70,32 @@ def my_collection_view(request):
     }
     return render(request, 'my_collection.html', context)
 
+
+def create_post_view(request):
+    """Render the secret create-post page for authenticated users."""
+    if not request.user.is_authenticated:
+        return redirect('/login/?next=/create/', permanent=False)
+
+    preferred_path = request.COOKIES.get('preferred_language_path', '/es/en/')
+    source_language_code, target_language_code = SUPPORTED_LANGUAGE_PATHS.get(
+        preferred_path,
+        ('es', 'en')
+    )
+
+    canonical_url = request.build_absolute_uri('/create/')
+    context = {
+        'canonical_url': canonical_url,
+        'source_language_code': source_language_code,
+        'target_language_code': target_language_code,
+    }
+    return render(request, 'create_post.html', context)
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("accounts/", include("allauth.urls")),
     path('api/v1/', include('feed.urls')),
     path('login/', login_view, name='login'),
+    path('create/', create_post_view, name='create_post_page'),
     path('me/collection/', my_collection_view, name='my_collection'),
     path('es/en/', lambda request: language_feed_view(request, 'es', 'en'), name='es_en_index'),
     path('fr/en/', lambda request: language_feed_view(request, 'fr', 'en'), name='fr_en_index'),

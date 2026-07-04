@@ -1,6 +1,7 @@
 import base64
 import json
 from datetime import datetime
+from urllib.parse import urlparse, urlunparse
 from django.utils import timezone
 from django.db.models import Q, F
 from django.db import transaction, IntegrityError
@@ -9,7 +10,80 @@ from django.utils.decorators import method_decorator
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Post, PostStatus, EngagementEvent, EngagementType, AnalyticsEvent
+from .models import Post, PostStatus, EngagementEvent, EngagementType, AnalyticsEvent, SourceProvider
+
+
+SUPPORTED_LANGUAGE_PAIRS = {
+    ('es', 'en'),
+    ('fr', 'en'),
+    ('ko', 'en'),
+    ('ko', 'zh-hant'),
+    ('es', 'zh-hant'),
+}
+
+SUPPORTED_SOURCE_LANGUAGES = {'es', 'fr', 'ko'}
+SUPPORTED_TARGET_LANGUAGES = {'en', 'zh-hant'}
+
+
+def build_feed_path(source_language_code, target_language_code):
+    """Build a feed path for a supported language pair."""
+    return f'/{source_language_code}/{target_language_code}/'
+
+
+def detect_source_provider(url):
+    """Detect the source provider from a URL."""
+    parsed = urlparse(url)
+    hostname = (parsed.hostname or '').lower()
+
+    if hostname.startswith('www.'):
+        hostname = hostname[4:]
+    if hostname.startswith('m.'):
+        hostname = hostname[2:]
+
+    provider_domains = {
+        SourceProvider.REDDIT: ('reddit.com', 'redd.it'),
+        SourceProvider.INSTAGRAM: ('instagram.com',),
+        SourceProvider.TWITTER: ('twitter.com', 'x.com'),
+        SourceProvider.IMGUR: ('imgur.com',),
+        SourceProvider.FACEBOOK: ('facebook.com', 'fb.watch'),
+    }
+
+    for provider, domains in provider_domains.items():
+        for domain in domains:
+            if hostname == domain or hostname.endswith(f'.{domain}'):
+                return provider
+
+    return None
+
+
+def canonicalize_source_url(raw_url):
+    """Normalize a source URL for storage, embeds, and duplicate detection."""
+    parsed = urlparse(raw_url.strip())
+    if parsed.scheme not in ('http', 'https') or not parsed.netloc:
+        return None
+
+    hostname = (parsed.hostname or '').lower()
+    if hostname.startswith('www.'):
+        hostname = hostname[4:]
+    if hostname.startswith('m.'):
+        hostname = hostname[2:]
+
+    netloc = hostname
+    if parsed.port:
+        netloc = f'{netloc}:{parsed.port}'
+
+    path = parsed.path or '/'
+    if path != '/':
+        path = path.rstrip('/')
+
+    normalized = parsed._replace(
+        scheme='https',
+        netloc=netloc,
+        path=path,
+        params='',
+        fragment='',
+    )
+    return urlunparse(normalized)
 
 
 def get_user_engagement_map(user, post_ids):
@@ -465,6 +539,90 @@ class EngagementView(APIView):
         
         # Return 204 No Content (no JSON body)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class CreatePostView(APIView):
+    """
+    API endpoint for creating a new post.
+
+    POST /api/v1/posts
+    """
+
+    def post(self, request):
+        if not request.user.is_authenticated:
+            return Response(
+                {"error": "Authentication required"},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        source_language_code = (request.data.get('source_language_code') or '').strip().lower()
+        target_language_code = (request.data.get('target_language_code') or '').strip().lower()
+        source_raw_url = (request.data.get('source_raw_url') or '').strip()
+        translation_text = (request.data.get('translation_text') or '').strip()
+        explanation_text = (request.data.get('explanation_text') or '').strip()
+
+        if source_language_code not in SUPPORTED_SOURCE_LANGUAGES:
+            return Response(
+                {"error": "Unsupported source language"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if target_language_code not in SUPPORTED_TARGET_LANGUAGES:
+            return Response(
+                {"error": "Unsupported target language"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if (source_language_code, target_language_code) not in SUPPORTED_LANGUAGE_PAIRS:
+            return Response(
+                {"error": "Unsupported language pair"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if not source_raw_url:
+            return Response(
+                {"error": "source_raw_url is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        has_translation = bool(translation_text)
+        has_explanation = bool(explanation_text)
+
+        if not has_translation and not has_explanation:
+            return Response(
+                {"error": "Either translation or explanation is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        source_canonical_url = canonicalize_source_url(source_raw_url)
+        if not source_canonical_url:
+            return Response(
+                {"error": "Enter a valid source URL"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        source_provider = detect_source_provider(source_canonical_url)
+        if not source_provider:
+            return Response(
+                {"error": "Only Reddit, Instagram, X/Twitter, Imgur, and Facebook URLs are supported right now"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        post = Post.objects.create(
+            source_language_code=source_language_code,
+            target_language_code=target_language_code,
+            source_provider=source_provider,
+            source_raw_url=source_raw_url,
+            source_canonical_url=source_canonical_url,
+            translation_text=translation_text,
+            explanation_text=explanation_text or None,
+            author_user=request.user,
+        )
+
+        return Response(
+            {"post_id": str(post.id)},
+            status=status.HTTP_201_CREATED
+        )
 
 
 @method_decorator(csrf_exempt, name='dispatch')
