@@ -197,11 +197,11 @@ function renderPost(post, options = {}) {
                 <div class="post-engagement">
                     <div class="engagement-item helpful${helpfulActive} clickable" data-engagement-type="helpful" data-post-id="${post.id}">
                         <span>👍</span>
-                        <span class="engagement-count">${post.engagement.helpful}</span> <span class="engagement-label">${t('helpful')}</span>
+                        ${renderEngagementCount(post.engagement.helpful)} <span class="engagement-label">${t('helpful')}</span>
                     </div>
                     <div class="engagement-item confusing${confusingActive} clickable" data-engagement-type="confusing" data-post-id="${post.id}">
                         <span>😕</span>
-                        <span class="engagement-count">${post.engagement.confusing}</span> <span class="engagement-label">${t('confusing')}</span>
+                        ${renderEngagementCount(post.engagement.confusing)} <span class="engagement-label">${t('confusing')}</span>
                     </div>
                 </div>
             </div>
@@ -210,6 +210,35 @@ function renderPost(post, options = {}) {
             </div>
         </div>
     `;
+}
+
+function renderEngagementCount(count) {
+    if (!count) {
+        return '';
+    }
+
+    return `<span class="engagement-count">${count}</span>`;
+}
+
+function setEngagementCount(item, count) {
+    const existingCount = item.querySelector('.engagement-count');
+
+    if (count <= 0) {
+        if (existingCount) {
+            existingCount.remove();
+        }
+        return;
+    }
+
+    if (existingCount) {
+        existingCount.textContent = count;
+        return;
+    }
+
+    const icon = item.querySelector('span');
+    if (icon) {
+        icon.insertAdjacentHTML('afterend', ` ${renderEngagementCount(count)}`);
+    }
 }
 
 function embedPost(post) {
@@ -536,13 +565,17 @@ function updateEngagementUI(postId, newType) {
     if (helpfulCount) {
         const currentCount = parseInt(helpfulCount.textContent) || 0;
         const newCount = Math.max(0, currentCount + helpfulDelta);
-        helpfulCount.textContent = newCount;
+        setEngagementCount(helpfulItem, newCount);
+    } else if (helpfulDelta > 0) {
+        setEngagementCount(helpfulItem, helpfulDelta);
     }
     
     if (confusingCount) {
         const currentCount = parseInt(confusingCount.textContent) || 0;
         const newCount = Math.max(0, currentCount + confusingDelta);
-        confusingCount.textContent = newCount;
+        setEngagementCount(confusingItem, newCount);
+    } else if (confusingDelta > 0) {
+        setEngagementCount(confusingItem, confusingDelta);
     }
 }
 
