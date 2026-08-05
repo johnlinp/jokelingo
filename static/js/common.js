@@ -186,14 +186,14 @@ function renderPost(post, options = {}) {
                 ${post.contribution?.translation?.text ? `
                     <h4>${t('Translation')}</h4>
                     <details class="explanation-toggle">
-                        <summary class="explanation-summary">${t('click me')}</summary>
+                        <summary class="explanation-summary" data-analytics-event="translation_click">${t('click me')}</summary>
                         <div class="translation">${post.contribution.translation.text}</div>
                     </details>
                 ` : ''}
                 ${post.contribution?.explanation?.text ? `
                     <h4>${t('Why is it funny?')}</h4>
                     <details class="explanation-toggle">
-                        <summary class="explanation-summary">${t('click me')}</summary>
+                        <summary class="explanation-summary" data-analytics-event="why_is_it_funny_click">${t('click me')}</summary>
                         <div class="explanation">${post.contribution.explanation.text}</div>
                     </details>
                 ` : ''}
@@ -741,8 +741,13 @@ function attachExplanationHandlers() {
         summary.addEventListener('click', () => {
             const postCard = summary.closest('.post-card');
             const postId = postCard ? postCard.dataset.postId : null;
+            const eventType = summary.dataset.analyticsEvent;
 
-            trackAnalyticsEvent('why_is_it_funny_click', {
+            if (!eventType) {
+                return;
+            }
+
+            trackAnalyticsEvent(eventType, {
                 post_id: postId
             });
         });
