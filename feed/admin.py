@@ -97,10 +97,10 @@ class EngagementEventAdmin(admin.ModelAdmin):
 class AnalyticsEventAdmin(admin.ModelAdmin):
     """Admin interface for AnalyticsEvent model."""
     
-    list_display = ['id', 'event_type', 'user', 'metadata_display', 'created_at']
-    list_filter = ['event_type', 'created_at']
+    list_display = ['id', 'event_type', 'user', 'client_country_code', 'metadata_display', 'created_at']
+    list_filter = ['event_type', 'client_country_code', 'created_at']
     search_fields = ['id', 'user__id', 'user__email']
-    readonly_fields = ['id', 'created_at', 'event_type', 'user', 'metadata_display', 'user_agent']
+    readonly_fields = ['id', 'created_at', 'event_type', 'user', 'client_country_code', 'metadata_display', 'user_agent']
     
     def metadata_display(self, obj):
         """Display metadata in a readable format."""

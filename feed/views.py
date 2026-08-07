@@ -1,6 +1,11 @@
 import base64
 import json
+import ipaddress
+import logging
+import os
+from functools import lru_cache
 from datetime import datetime
+from pathlib import Path
 from urllib.parse import urlparse, urlunparse
 from django.utils import timezone
 from django.db.models import Q, F
@@ -11,6 +16,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Post, PostStatus, EngagementEvent, EngagementType, AnalyticsEvent, SourceProvider
+
+logger = logging.getLogger(__name__)
 
 
 SUPPORTED_LANGUAGE_PAIRS = {
@@ -23,6 +30,9 @@ SUPPORTED_LANGUAGE_PAIRS = {
 
 SUPPORTED_SOURCE_LANGUAGES = {'es', 'fr', 'ko'}
 SUPPORTED_TARGET_LANGUAGES = {'en', 'zh-hant'}
+DEFAULT_GEOIP_DB_PATH = (
+    Path(__file__).resolve().parent.parent / 'vendor' / 'geoip' / 'dbip-country-lite.mmdb'
+)
 
 
 def build_feed_path(source_language_code, target_language_code):
@@ -186,6 +196,107 @@ def parse_cursor(cursor_str):
         cursor_json = cursor_bytes.decode('utf-8')
         return json.loads(cursor_json)
     except (ValueError, json.JSONDecodeError):
+        return None
+
+
+def get_client_country_code(request):
+    """
+    Return a normalized client country code.
+
+    Derive the country code transiently from the client IP via a configured
+    GeoIP service, without storing the raw IP address.
+    """
+    client_ip = get_client_ip_address(request)
+    if not client_ip:
+        return None
+
+    return lookup_country_code_for_ip(client_ip)
+
+
+def get_client_ip_address(request):
+    """Extract the first valid public client IP address from request headers."""
+    raw_value = request.META.get('HTTP_X_FORWARDED_FOR')
+    if not raw_value:
+        return None
+
+    for candidate in raw_value.split(','):
+        normalized_ip = normalize_public_ip(candidate)
+        if normalized_ip:
+            return normalized_ip
+
+    return None
+
+
+def normalize_public_ip(raw_value):
+    """Normalize a candidate IP address and reject non-public addresses."""
+    if not raw_value:
+        return None
+
+    candidate = raw_value.strip()
+    if candidate.startswith('[') and ']' in candidate:
+        candidate = candidate[1:candidate.index(']')]
+    elif candidate.count(':') == 1 and '.' in candidate:
+        host, _, port = candidate.partition(':')
+        if port.isdigit():
+            candidate = host
+
+    try:
+        ip_obj = ipaddress.ip_address(candidate)
+    except ValueError:
+        return None
+
+    if not ip_obj.is_global:
+        return None
+
+    return ip_obj.compressed
+
+
+def lookup_country_code_for_ip(ip_address_value):
+    """Look up a country code for a public IP using a local MMDB database."""
+    reader = get_geoip_country_reader()
+    if reader is None:
+        return None
+
+    try:
+        response = reader.get(ip_address_value)
+    except ValueError:
+        return None
+
+    if not response:
+        return None
+
+    country_code = (
+        response.get('country', {}).get('iso_code')
+        or response.get('registered_country', {}).get('iso_code')
+        or response.get('represented_country', {}).get('iso_code')
+    )
+    if country_code:
+        country_code = country_code.strip().upper()
+        return country_code
+
+    return None
+
+
+@lru_cache(maxsize=1)
+def get_geoip_country_reader():
+    """
+    Lazily open the local country MMDB database.
+    """
+    db_path = str(DEFAULT_GEOIP_DB_PATH)
+    if not db_path:
+        logger.error("GeoIP database path is empty")
+        return None
+
+    try:
+        import maxminddb
+    except ImportError as exc:
+        logger.error("Failed to import maxminddb for GeoIP lookup: %s", exc)
+        return None
+
+    try:
+        return maxminddb.open_database(db_path)
+    except OSError as exc:
+        logger.error("Failed to open GeoIP database at %s: %s", db_path, exc)
         return None
 
 
@@ -650,6 +761,7 @@ class AnalyticsView(APIView):
         AnalyticsEvent.objects.create(
             event_type=event_type,
             user=request.user if request.user.is_authenticated else None,
+            client_country_code=get_client_country_code(request),
             metadata=metadata,
             user_agent=user_agent
         )

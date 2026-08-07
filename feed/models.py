@@ -180,6 +180,12 @@ class AnalyticsEvent(models.Model):
         blank=True,
         db_index=True
     )
+    client_country_code = models.CharField(
+        max_length=10,
+        null=True,
+        blank=True,
+        db_index=True
+    )
     metadata = models.JSONField(null=True, blank=True)
     user_agent = models.TextField(null=True, blank=True)
     
