@@ -10,6 +10,7 @@ if (typeof window.isAuthenticated === 'undefined') {
 const LANGUAGE_NAMES = {
     'es': 'Spanish',
     'fr': 'French',
+    'ja': 'Japanese',
     'ko': 'Korean',
     'en': 'English',
     'zh-hant': 'Traditional Chinese',

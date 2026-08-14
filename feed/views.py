@@ -23,12 +23,14 @@ logger = logging.getLogger(__name__)
 SUPPORTED_LANGUAGE_PAIRS = {
     ('es', 'en'),
     ('fr', 'en'),
+    ('ja', 'en'),
     ('ko', 'en'),
+    ('ja', 'zh-hant'),
     ('ko', 'zh-hant'),
     ('es', 'zh-hant'),
 }
 
-SUPPORTED_SOURCE_LANGUAGES = {'es', 'fr', 'ko'}
+SUPPORTED_SOURCE_LANGUAGES = {'es', 'fr', 'ja', 'ko'}
 SUPPORTED_TARGET_LANGUAGES = {'en', 'zh-hant'}
 DEFAULT_GEOIP_DB_PATH = (
     Path(__file__).resolve().parent.parent / 'vendor' / 'geoip' / 'dbip-country-lite.mmdb'

@@ -9,7 +9,9 @@ from django.shortcuts import redirect, render
 SUPPORTED_LANGUAGE_PATHS = {
     '/es/en/': ('es', 'en'),
     '/fr/en/': ('fr', 'en'),
+    '/ja/en/': ('ja', 'en'),
     '/ko/en/': ('ko', 'en'),
+    '/ja/zh-hant/': ('ja', 'zh-hant'),
     '/ko/zh-hant/': ('ko', 'zh-hant'),
     '/es/zh-hant/': ('es', 'zh-hant'),
 }
@@ -99,7 +101,9 @@ urlpatterns = [
     path('me/collection/', my_collection_view, name='my_collection'),
     path('es/en/', lambda request: language_feed_view(request, 'es', 'en'), name='es_en_index'),
     path('fr/en/', lambda request: language_feed_view(request, 'fr', 'en'), name='fr_en_index'),
+    path('ja/en/', lambda request: language_feed_view(request, 'ja', 'en'), name='ja_en_index'),
     path('ko/en/', lambda request: language_feed_view(request, 'ko', 'en'), name='ko_en_index'),
+    path('ja/zh-hant/', lambda request: language_feed_view(request, 'ja', 'zh-hant'), name='ja_zh_hant_index'),
     path('ko/zh-hant/', lambda request: language_feed_view(request, 'ko', 'zh-hant'), name='ko_zh_hant_index'),
     path('es/zh-hant/', lambda request: language_feed_view(request, 'es', 'zh-hant'), name='es_zh_hant_index'),
     path('', root_redirect_view, name='root_redirect'),

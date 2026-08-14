@@ -24,8 +24,14 @@ msgstr "Spanish → English"
 msgid "French → English"
 msgstr "French → English"
 
+msgid "Japanese → English"
+msgstr "Japanese → English"
+
 msgid "Korean → English"
 msgstr "Korean → English"
+
+msgid "Japanese → Traditional Chinese"
+msgstr "Japanese → Traditional Chinese"
 
 msgid "Korean → Traditional Chinese"
 msgstr "Korean → Traditional Chinese"
@@ -107,6 +113,9 @@ msgstr "You haven't added anything to your collection yet."
 
 msgid "Korean"
 msgstr "Korean"
+
+msgid "Japanese"
+msgstr "Japanese"
 
 msgid "Traditional Chinese"
 msgstr "Traditional Chinese"

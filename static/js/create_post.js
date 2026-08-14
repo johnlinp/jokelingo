@@ -2,7 +2,9 @@ function initCreatePostPage(config) {
     const supportedPairs = new Set([
         'es:en',
         'fr:en',
+        'ja:en',
         'ko:en',
+        'ja:zh-hant',
         'ko:zh-hant',
         'es:zh-hant',
     ]);

@@ -27,8 +27,14 @@ msgstr "西班牙文 → 英文"
 msgid "French → English"
 msgstr "法文 → 英文"
 
+msgid "Japanese → English"
+msgstr "日文 → 英文"
+
 msgid "Korean → English"
 msgstr "韓文 → 英文"
+
+msgid "Japanese → Traditional Chinese"
+msgstr "日文 → 正體中文"
 
 msgid "Korean → Traditional Chinese"
 msgstr "韓文 → 正體中文"
@@ -110,6 +116,9 @@ msgstr "您尚未將任何內容加入收藏"
 
 msgid "Korean"
 msgstr "韓文"
+
+msgid "Japanese"
+msgstr "日文"
 
 msgid "Traditional Chinese"
 msgstr "正體中文"
