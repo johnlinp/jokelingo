@@ -25,6 +25,8 @@ function initCreatePostPage(config) {
     const previewContributionFields = document.getElementById('previewContributionFields');
 
     let previewTimeout = null;
+    let currentPreviewSourceUrl = null;
+    let currentPreviewSourceProvider = null;
 
     window.isAuthenticated = true;
 
@@ -172,6 +174,8 @@ function initCreatePostPage(config) {
         previewContainer.style.display = 'none';
         previewEmpty.style.display = 'block';
         previewContributionFields.style.display = 'none';
+        currentPreviewSourceUrl = null;
+        currentPreviewSourceProvider = null;
     }
 
     function mountContributionFields() {
@@ -201,11 +205,43 @@ function initCreatePostPage(config) {
         }
 
         const previewPost = buildPreviewPost(provider);
-        previewContainer.innerHTML = renderPreviewPost(previewPost);
-        previewContainer.style.display = 'grid';
-        previewEmpty.style.display = 'none';
-        embedPost(previewPost);
-        mountContributionFields();
+        const nextSourceUrl = previewPost.source.canonical_url;
+        const shouldRemountPreview =
+            !previewContainer.querySelector('.post-card');
+        const shouldRemountEmbed =
+            shouldRemountPreview ||
+            currentPreviewSourceUrl !== nextSourceUrl ||
+            currentPreviewSourceProvider !== provider;
+
+        if (shouldRemountPreview) {
+            previewContainer.innerHTML = renderPreviewPost(previewPost);
+            previewContainer.style.display = 'grid';
+            previewEmpty.style.display = 'none';
+            mountContributionFields();
+        } else {
+            const postCard = previewContainer.querySelector('.post-card');
+            const authorDisplayName = escapePreviewHtml(previewPost.author?.display_name || 'Anonymous');
+            const languageLine = `${getLanguageName(previewPost.languages.source_language_code)} → ${getLanguageName(previewPost.languages.target_language_code)}`;
+            const authorLine = `${languageLine} • ${t('By')} <strong>${authorDisplayName}</strong> • ${formatDate(previewPost.created_at)}`;
+            const postAuthor = postCard?.querySelector('.post-author');
+
+            previewContainer.style.display = 'grid';
+            previewEmpty.style.display = 'none';
+            if (postAuthor) {
+                postAuthor.innerHTML = authorLine;
+            }
+            mountContributionFields();
+        }
+
+        if (shouldRemountEmbed) {
+            const embedContainer = previewContainer.querySelector(`#embed-${previewPost.id}`);
+            if (embedContainer) {
+                embedContainer.innerHTML = `<div class="embed-loading">${t('Loading embedded post...')}</div>`;
+            }
+            embedPost(previewPost);
+            currentPreviewSourceUrl = nextSourceUrl;
+            currentPreviewSourceProvider = provider;
+        }
     }
 
     function schedulePreviewRender() {
