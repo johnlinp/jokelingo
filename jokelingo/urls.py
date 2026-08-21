@@ -4,7 +4,8 @@ URL configuration for jokelingo project.
 from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import TemplateView
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
+from feed.models import Post, PostStatus
 
 SUPPORTED_LANGUAGE_PATHS = {
     '/es/en/': ('es', 'en'),
@@ -92,6 +93,20 @@ def create_post_view(request):
     }
     return render(request, 'create_post.html', context)
 
+
+def post_detail_view(request, short_code):
+    """Render the canonical, publicly shareable page for one active post."""
+    post = get_object_or_404(
+        Post,
+        short_code=short_code,
+        status=PostStatus.ACTIVE,
+    )
+    canonical_url = request.build_absolute_uri(f'/post/{post.short_code}/')
+    return render(request, 'post_detail.html', {
+        'canonical_url': canonical_url,
+        'short_code': post.short_code,
+    })
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("accounts/", include("allauth.urls")),
@@ -99,6 +114,7 @@ urlpatterns = [
     path('login/', login_view, name='login'),
     path('create/', create_post_view, name='create_post_page'),
     path('me/collection/', my_collection_view, name='my_collection'),
+    path('post/<str:short_code>/', post_detail_view, name='post_detail'),
     path('es/en/', lambda request: language_feed_view(request, 'es', 'en'), name='es_en_index'),
     path('fr/en/', lambda request: language_feed_view(request, 'fr', 'en'), name='fr_en_index'),
     path('ja/en/', lambda request: language_feed_view(request, 'ja', 'en'), name='ja_en_index'),

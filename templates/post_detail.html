@@ -1,0 +1,88 @@
+{% load i18n %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE|default:'en' }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% trans "Post" %} - Jokelingo</title>
+    <link rel="canonical" href="{{ canonical_url }}">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ canonical_url }}">
+    <meta property="og:title" content="{% trans 'Post' %} - Jokelingo">
+    <meta property="og:site_name" content="Jokelingo">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:url" content="{{ canonical_url }}">
+    <meta name="twitter:title" content="{% trans 'Post' %} - Jokelingo">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="icon" href="{% static 'images/favicon.ico' %}">
+</head>
+<body>
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <h1><a href="/">Jokelingo</a></h1>
+            <p>{% trans "Laugh in every language" %}</p>
+        </div>
+        <div class="top-bar-right">
+            {% if user.is_authenticated %}
+                <div class="user-menu-container">
+                    <div class="user-display-name" id="userMenuTrigger">{{ user.display_name }}</div>
+                    <div class="user-menu-dropdown" id="userMenuDropdown">
+                        <a href="/me/collection/" class="user-menu-item">{% trans "My Collection" %}</a>
+                        <a href="/accounts/logout/" class="user-menu-item">{% trans "Logout" %}</a>
+                    </div>
+                </div>
+            {% else %}
+                <a class="login-btn" href="/login/?next=/post/{{ short_code }}/">{% trans "Login" %}</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="container">
+        <div id="error" class="error" style="display: none;"></div>
+        <div id="loading" class="loading" style="display: none;">{% trans "Loading post..." %}</div>
+        <div id="postsContainer" class="posts-container"></div>
+    </div>
+
+    <script src="{% static 'js/common.js' %}"></script>
+    <script src="{% static 'js/post_detail.js' %}"></script>
+    <script>
+        {% trans "Translation" as msg_translation %}
+        {% trans "Why is it funny?" as msg_explanation %}
+        {% trans "click me" as msg_click_to_reveal %}
+        {% trans "helpful" as msg_helpful %}
+        {% trans "confusing" as msg_confusing %}
+        {% trans "By" as msg_by %}
+        {% trans "Loading embedded post..." as msg_loading_embed %}
+        {% trans "Post not found." as msg_post_not_found %}
+        {% trans "Error loading post:" as msg_error_post %}
+        {% trans "Korean" as msg_korean %}
+        {% trans "Japanese" as msg_japanese %}
+        {% trans "Traditional Chinese" as msg_traditional_chinese %}
+        {% trans "Spanish" as msg_spanish %}
+        {% trans "English" as msg_english %}
+        {% trans "French" as msg_french %}
+        window.i18n = {
+            'Translation': '{{ msg_translation|escapejs }}',
+            'Why is it funny?': '{{ msg_explanation|escapejs }}',
+            'click me': '{{ msg_click_to_reveal|escapejs }}',
+            'helpful': '{{ msg_helpful|escapejs }}',
+            'confusing': '{{ msg_confusing|escapejs }}',
+            'By': '{{ msg_by|escapejs }}',
+            'Loading embedded post...': '{{ msg_loading_embed|escapejs }}',
+            'Post not found.': '{{ msg_post_not_found|escapejs }}',
+            'Error loading post:': '{{ msg_error_post|escapejs }}',
+            'Korean': '{{ msg_korean|escapejs }}',
+            'Japanese': '{{ msg_japanese|escapejs }}',
+            'Traditional Chinese': '{{ msg_traditional_chinese|escapejs }}',
+            'Spanish': '{{ msg_spanish|escapejs }}',
+            'English': '{{ msg_english|escapejs }}',
+            'French': '{{ msg_french|escapejs }}'
+        };
+        initPostDetailPage({
+            isAuthenticated: {% if user.is_authenticated %}true{% else %}false{% endif %},
+            shortCode: '{{ short_code|escapejs }}'
+        });
+    </script>
+</body>
+</html>

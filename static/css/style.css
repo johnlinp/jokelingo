@@ -468,6 +468,15 @@ body {
     overflow-x: hidden;
 }
 
+.post-card--clickable {
+    cursor: pointer;
+}
+
+.post-card--clickable:focus-visible {
+    outline: 3px solid #667eea;
+    outline-offset: 3px;
+}
+
 @media (min-width: 769px) {
     .post-card {
         display: grid;

@@ -55,6 +55,7 @@ function initMyCollectionPage(config) {
                 // Attach engagement click handlers
                 attachEngagementHandlers();
                 attachExplanationHandlers();
+                attachPostPermalinkHandlers();
             } else {
                 if (!append) {
                     // Show empty state

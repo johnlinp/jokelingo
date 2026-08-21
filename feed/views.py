@@ -138,6 +138,8 @@ def post_to_dict(post, my_engagement_type=None):
     """
     result = {
         "id": str(post.id),
+        "short_code": post.short_code,
+        "permalink": f"/post/{post.short_code}/",
         "created_at": post.created_at.isoformat(),
         "languages": {
             "source_language_code": post.source_language_code,
@@ -495,6 +497,28 @@ class FeedView(APIView):
             response_data["meta"]["next_cursor"] = next_cursor
         
         return Response(response_data, status=status.HTTP_200_OK)
+
+
+class PostByCodeView(APIView):
+    """Return one active post addressed by its public short code."""
+
+    def get(self, request, short_code):
+        try:
+            post = Post.objects.select_related('author_user').get(
+                short_code=short_code,
+                status=PostStatus.ACTIVE,
+            )
+        except Post.DoesNotExist:
+            return Response(
+                {"error": "Post not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        my_engagement_type = None
+        if request.user.is_authenticated:
+            my_engagement_type = get_user_engagement_map(request.user, [post.id]).get(post.id, 'none')
+
+        return Response(post_to_dict(post, my_engagement_type=my_engagement_type))
 
 
 class MyCollectionView(APIView):

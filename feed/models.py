@@ -8,9 +8,19 @@ This module defines the database schema:
 - AnalyticsEvent: Privacy-friendly analytics events (no IP, no sessions)
 """
 
+import secrets
 import uuid
-from django.db import models
+from django.db import IntegrityError, models, transaction
 from django.contrib.auth.models import AbstractUser
+
+
+SHORT_CODE_ALPHABET = 'abcdefghijklmnopqrstuvwxyz0123456789'
+SHORT_CODE_LENGTH = 8
+
+
+def generate_short_code():
+    """Generate a compact, URL-safe public identifier for a post."""
+    return ''.join(secrets.choice(SHORT_CODE_ALPHABET) for _ in range(SHORT_CODE_LENGTH))
 
 
 class User(AbstractUser):
@@ -63,6 +73,7 @@ class Post(models.Model):
     
     # Identity
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    short_code = models.CharField(max_length=SHORT_CODE_LENGTH, unique=True, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     status = models.CharField(
@@ -104,6 +115,22 @@ class Post(models.Model):
     
     def __str__(self):
         return f"Post {self.id} ({self.source_language_code} -> {self.target_language_code})"
+
+    def save(self, *args, **kwargs):
+        if not self._state.adding or self.short_code:
+            return super().save(*args, **kwargs)
+
+        for _ in range(10):
+            self.short_code = generate_short_code()
+            try:
+                # A savepoint lets us retry a uniqueness collision inside callers' transactions.
+                with transaction.atomic():
+                    return super().save(*args, **kwargs)
+            except IntegrityError:
+                if not type(self).objects.filter(short_code=self.short_code).exists():
+                    raise
+
+        raise RuntimeError('Could not generate a unique post short code')
 
 
 class EngagementType(models.TextChoices):

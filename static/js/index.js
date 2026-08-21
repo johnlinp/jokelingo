@@ -73,6 +73,7 @@ function initIndexPage(config) {
                 // Attach engagement click handlers
                 attachEngagementHandlers();
                 attachExplanationHandlers();
+                attachPostPermalinkHandlers();
             } else {
                 if (!append) {
                     postsContainer.innerHTML = `<div class="post-card"><p>${t('No posts found.')}</p></div>`;
