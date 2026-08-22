@@ -60,7 +60,7 @@ function initMyCollectionPage(config) {
                 if (!append) {
                     // Show empty state
                     postsContainer.innerHTML = `
-                        <div class="post-card" style="text-align: center; padding: 40px;">
+                        <div class="post-card post-card--empty-state" style="text-align: center; padding: 40px;">
                             <p style="font-size: 1.1em; color: #4a5568; margin-bottom: 10px;">
                                 ${t('You haven\'t added anything to your collection yet.')}
                             </p>
