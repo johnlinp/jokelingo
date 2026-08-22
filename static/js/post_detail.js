@@ -28,7 +28,17 @@ function initPostDetailPage(config) {
             }
 
             const post = await response.json();
+            const sourceLanguageCode = post.languages.source_language_code;
+            const targetLanguageCode = post.languages.target_language_code;
+            const feedPath = `/${sourceLanguageCode}/${targetLanguageCode}/`;
+            const feedLabel = `${getLanguageName(sourceLanguageCode)} → ${getLanguageName(targetLanguageCode)}`;
+
             postsContainer.innerHTML = renderPost(post, { linkToPermalink: false });
+            const postAuthor = postsContainer.querySelector('.post-author');
+            postAuthor.insertAdjacentHTML(
+                'beforeend',
+                ` <span aria-hidden="true">•</span> <a class="single-post-feed-link" href="${feedPath}">${feedLabel}</a>`
+            );
             embedPost(post);
             attachEngagementHandlers();
             attachExplanationHandlers();

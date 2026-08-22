@@ -457,6 +457,23 @@ body {
     gap: 20px;
 }
 
+.single-post-feed-link {
+    color: #2d3748;
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.single-post-feed-link:hover {
+    color: #718096;
+}
+
+.single-post-feed-link:focus-visible {
+    outline: 3px solid #667eea;
+    outline-offset: 3px;
+}
+
 .post-card {
     background: white;
     border-radius: 10px;
