@@ -338,15 +338,12 @@ function initCreatePostPage(config) {
             const data = await response.json().catch(() => ({}));
 
             trackAnalyticsEvent('publish_success', {
-                post_id: data.post_id || null,
+                post_id: data.id || null,
                 source_language_code: sourceLanguageSelect.value,
                 target_language_code: targetLanguageSelect.value,
             });
 
-            publishSuccess.innerHTML = `<p>${t('Post published successfully.')}</p>`;
-            publishSuccess.style.display = 'block';
-
-            resetDraftFields({ clearMessages: false });
+            window.location.assign(data.permalink);
         } catch (err) {
             publishError.textContent = err.message;
             publishError.style.display = 'block';

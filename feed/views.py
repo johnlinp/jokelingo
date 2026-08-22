@@ -757,7 +757,7 @@ class CreatePostView(APIView):
         )
 
         return Response(
-            {"post_id": str(post.id)},
+            post_to_dict(post),
             status=status.HTTP_201_CREATED
         )
 
