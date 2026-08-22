@@ -72,6 +72,13 @@ msgstr "Posts you've saved"
 msgid "Back to home"
 msgstr "Back to home"
 
+msgid "Almost there!"
+msgstr "Almost there!"
+
+#, python-format
+msgid "New here? We ask everyone to spend their first %(minimum_age)s days getting to know Jokelingo before posting. It helps keep the community fun and useful. You can publish after %(eligible_date)s."
+msgstr "New here? We ask everyone to spend their first %(minimum_age)s days getting to know Jokelingo before posting. It helps keep the community fun and useful. You can publish after %(eligible_date)s."
+
 msgid "No posts found."
 msgstr "No posts found."
 

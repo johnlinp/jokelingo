@@ -1,0 +1,67 @@
+{% load i18n %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE|default:'en' }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <title>Jokelingo</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="icon" href="{% static 'images/favicon.ico' %}">
+    <style>
+        .posting-unavailable {
+            max-width: 540px;
+            margin: 12vh auto 0;
+            padding: 32px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+            text-align: center;
+        }
+
+        .posting-unavailable h2 {
+            margin-bottom: 14px;
+            color: #2d3748;
+        }
+
+        .posting-unavailable p {
+            margin-bottom: 24px;
+            color: #4a5568;
+            line-height: 1.6;
+        }
+
+        .back-home-link {
+            display: inline-block;
+            padding: 15px 32px;
+            background: #2d3748;
+            border: 0;
+            border-radius: 999px;
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            line-height: 1;
+            text-decoration: none;
+            transition: background-color 0.2s;
+        }
+
+        .back-home-link:hover {
+            background: #1a202c;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <h1><a href="/">Jokelingo</a></h1>
+            <p>{% trans "Laugh in every language" %}</p>
+        </div>
+    </div>
+
+    <main class="posting-unavailable">
+        <h2>{% trans "Almost there!" %}</h2>
+        <p>{% blocktrans with minimum_age=minimum_account_age_days eligible_date=eligible_at|date:"SHORT_DATE_FORMAT" %}New here? We ask everyone to spend their first {{ minimum_age }} days getting to know Jokelingo before posting. It helps keep the community fun and useful. You can publish after {{ eligible_date }}.{% endblocktrans %}</p>
+        <a href="/" class="back-home-link">{% trans "Back to home" %}</a>
+    </main>
+</body>
+</html>

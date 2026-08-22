@@ -2,9 +2,12 @@
 URL configuration for jokelingo project.
 """
 from django.contrib import admin
+from django.conf import settings
 from django.urls import path, include
 from django.views.generic import TemplateView
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
+from datetime import timedelta
 from feed.models import Post, PostStatus
 
 SUPPORTED_LANGUAGE_PATHS = {
@@ -78,6 +81,16 @@ def create_post_view(request):
     """Render the secret create-post page for authenticated users."""
     if not request.user.is_authenticated:
         return redirect('/login/?next=/create/', permanent=False)
+
+    minimum_account_age = timedelta(
+        days=settings.POST_CREATION_MIN_ACCOUNT_AGE_DAYS
+    )
+    eligible_at = request.user.created_at + minimum_account_age
+    if timezone.now() < eligible_at:
+        return render(request, 'create_post_unavailable.html', {
+            'eligible_at': eligible_at,
+            'minimum_account_age_days': settings.POST_CREATION_MIN_ACCOUNT_AGE_DAYS,
+        }, status=403)
 
     preferred_path = request.COOKIES.get('preferred_language_path', '/es/en/')
     source_language_code, target_language_code = SUPPORTED_LANGUAGE_PATHS.get(

@@ -4,10 +4,11 @@ import ipaddress
 import logging
 import os
 from functools import lru_cache
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from urllib.parse import urlparse, urlunparse
 from django.utils import timezone
+from django.conf import settings
 from django.db.models import Q, F
 from django.db import transaction, IntegrityError
 from django.views.decorators.csrf import csrf_exempt
@@ -690,6 +691,21 @@ class CreatePostView(APIView):
             return Response(
                 {"error": "Authentication required"},
                 status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        minimum_account_age = timedelta(
+            days=settings.POST_CREATION_MIN_ACCOUNT_AGE_DAYS
+        )
+        if timezone.now() - request.user.created_at < minimum_account_age:
+            return Response(
+                {
+                    "error": (
+                        "Your account must be at least "
+                        f"{settings.POST_CREATION_MIN_ACCOUNT_AGE_DAYS} days old "
+                        "before you can publish posts"
+                    )
+                },
+                status=status.HTTP_403_FORBIDDEN
             )
 
         source_language_code = (request.data.get('source_language_code') or '').strip().lower()

@@ -75,6 +75,13 @@ msgstr "您存起來的貼文"
 msgid "Back to home"
 msgstr "回到首頁"
 
+msgid "Almost there!"
+msgstr "再等幾天就可以發文囉！"
+
+#, python-format
+msgid "New here? We ask everyone to spend their first %(minimum_age)s days getting to know Jokelingo before posting. It helps keep the community fun and useful. You can publish after %(eligible_date)s."
+msgstr "剛加入嗎？我們希望大家先花 %(minimum_age)s 天逛逛 Jokelingo、熟悉一下這裡，再開始發文。這樣能讓社群保持有趣又實用。你可以在 %(eligible_date)s 後發文。"
+
 msgid "No posts found."
 msgstr "找不到貼文"
 
