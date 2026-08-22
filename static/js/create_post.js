@@ -1,4 +1,8 @@
 function initCreatePostPage(config) {
+    const draftStorageKey = 'jokelingo.create-post.draft';
+    const displayLanguageCookie = 'preferred_display_language';
+    const languagePathCookie = 'preferred_language_path';
+    const oneYearInSeconds = 31536000;
     const supportedPairs = new Set([
         'es:en',
         'fr:en',
@@ -47,7 +51,7 @@ function initCreatePostPage(config) {
     }
 
     function renderPreviewPost(post) {
-        const authorDisplayName = escapePreviewHtml(post.author?.display_name || 'Anonymous');
+        const authorDisplayName = escapePreviewHtml(post.author?.display_name);
         const languageLine = `${getLanguageName(post.languages.source_language_code)} → ${getLanguageName(post.languages.target_language_code)}`;
         const authorLine = `${languageLine} • ${t('By')} <strong>${authorDisplayName}</strong> • ${formatDate(post.created_at)}`;
 
@@ -164,7 +168,7 @@ function initCreatePostPage(config) {
             },
             author: {
                 id: config.authorId,
-                display_name: config.authorDisplayName || 'Anonymous',
+                display_name: config.authorDisplayName,
             },
         };
     }
@@ -220,7 +224,7 @@ function initCreatePostPage(config) {
             mountContributionFields();
         } else {
             const postCard = previewContainer.querySelector('.post-card');
-            const authorDisplayName = escapePreviewHtml(previewPost.author?.display_name || 'Anonymous');
+            const authorDisplayName = escapePreviewHtml(previewPost.author?.display_name);
             const languageLine = `${getLanguageName(previewPost.languages.source_language_code)} → ${getLanguageName(previewPost.languages.target_language_code)}`;
             const authorLine = `${languageLine} • ${t('By')} <strong>${authorDisplayName}</strong> • ${formatDate(previewPost.created_at)}`;
             const postAuthor = postCard?.querySelector('.post-author');
@@ -272,6 +276,62 @@ function initCreatePostPage(config) {
         if (clearMessages) {
             resetMessages();
         }
+    }
+
+    function saveDraftForLanguageSwitch() {
+        const draft = {
+            sourceRawUrl: sourceRawUrlInput.value,
+            sourceLanguageCode: sourceLanguageSelect.value,
+            targetLanguageCode: targetLanguageSelect.value,
+            translationText: translationTextarea.value,
+            explanationText: explanationTextarea.value,
+        };
+
+        try {
+            sessionStorage.setItem(draftStorageKey, JSON.stringify(draft));
+            return true;
+        } catch (err) {
+            console.error('Unable to save create-post draft before language switch.', err);
+            return false;
+        }
+    }
+
+    function restoreLanguageSwitchDraft() {
+        let draft;
+
+        try {
+            const savedDraft = sessionStorage.getItem(draftStorageKey);
+            if (!savedDraft) {
+                return false;
+            }
+            draft = JSON.parse(savedDraft);
+            sessionStorage.removeItem(draftStorageKey);
+        } catch (err) {
+            console.error('Unable to restore create-post draft after language switch.', err);
+            sessionStorage.removeItem(draftStorageKey);
+            return false;
+        }
+
+        sourceRawUrlInput.value = draft.sourceRawUrl || '';
+        sourceLanguageSelect.value = draft.sourceLanguageCode || config.sourceLanguageCode;
+        targetLanguageSelect.value = draft.targetLanguageCode || config.targetLanguageCode;
+        translationTextarea.value = draft.translationText || '';
+        explanationTextarea.value = draft.explanationText || '';
+        updatePairStatus();
+        renderPreview();
+        return true;
+    }
+
+    function switchDisplayLanguage() {
+        if (!saveDraftForLanguageSwitch()) {
+            return;
+        }
+
+        document.cookie = `${displayLanguageCookie}=${encodeURIComponent(targetLanguageSelect.value)}; max-age=${oneYearInSeconds}; path=/; samesite=Lax`;
+        if (isPairSupported()) {
+            document.cookie = `${languagePathCookie}=${encodeURIComponent(getFeedPath())}; max-age=${oneYearInSeconds}; path=/; samesite=Lax`;
+        }
+        window.location.reload();
     }
 
     function validateContributionFields() {
@@ -353,14 +413,17 @@ function initCreatePostPage(config) {
         }
     }
 
-    [sourceRawUrlInput, sourceLanguageSelect, targetLanguageSelect].forEach((field) => {
+    [sourceRawUrlInput, sourceLanguageSelect].forEach((field) => {
         field.addEventListener('input', schedulePreviewRender);
     });
+    targetLanguageSelect.addEventListener('change', switchDisplayLanguage);
 
     form.addEventListener('submit', handleSubmit);
 
     function initializePage() {
-        resetDraftFields();
+        if (!restoreLanguageSwitchDraft()) {
+            resetDraftFields();
+        }
         trackAnalyticsEvent('create_post_open', {
             path: window.location.pathname,
             source_language_code: sourceLanguageSelect.value,
@@ -370,5 +433,4 @@ function initCreatePostPage(config) {
     }
 
     window.addEventListener('DOMContentLoaded', initializePage);
-    window.addEventListener('pageshow', resetDraftFields);
 }

@@ -138,3 +138,45 @@ msgstr "英文"
 
 msgid "French"
 msgstr "法文"
+
+msgid "Create Post"
+msgstr "建立貼文"
+
+msgid "Add a new joke post with translation and context."
+msgstr "建立一則笑話貼文，並補上翻譯與背景說明。"
+
+msgid "Create a Post"
+msgstr "建立貼文"
+
+msgid "Source post URL"
+msgstr "來源貼文連結"
+
+msgid "Language"
+msgstr "語言"
+
+msgid "Live Preview"
+msgstr "貼文預覽"
+
+msgid "Add a source URL to see a preview."
+msgstr "貼上來源貼文連結即可預覽。"
+
+msgid "Enter a supported source URL."
+msgstr "請輸入支援的貼文連結。"
+
+msgid "That language pair is not supported yet."
+msgstr "此語言組合目前尚未支援。"
+
+msgid "Either translation or explanation is required."
+msgstr "請至少填寫翻譯或笑點說明。"
+
+msgid "Publish Post"
+msgstr "發布貼文"
+
+msgid "Publishing..."
+msgstr "正在發布..."
+
+msgid "Post published successfully."
+msgstr "貼文已發布。"
+
+msgid "Only Reddit, Instagram, X/Twitter, Imgur, and Facebook URLs are supported right now."
+msgstr "目前僅支援 Reddit、Instagram、X/Twitter、Imgur 與 Facebook 的貼文連結。"

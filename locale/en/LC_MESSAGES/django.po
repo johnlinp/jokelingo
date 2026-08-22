@@ -135,3 +135,45 @@ msgstr "English"
 
 msgid "French"
 msgstr "French"
+
+msgid "Create Post"
+msgstr "Create Post"
+
+msgid "Add a new joke post with translation and context."
+msgstr "Add a new joke post with translation and context."
+
+msgid "Create a Post"
+msgstr "Create a Post"
+
+msgid "Source post URL"
+msgstr "Source post URL"
+
+msgid "Language"
+msgstr "Language"
+
+msgid "Live Preview"
+msgstr "Live Preview"
+
+msgid "Add a source URL to see a preview."
+msgstr "Add a source URL to see a preview."
+
+msgid "Enter a supported source URL."
+msgstr "Enter a supported source URL."
+
+msgid "That language pair is not supported yet."
+msgstr "That language pair is not supported yet."
+
+msgid "Either translation or explanation is required."
+msgstr "Either translation or explanation is required."
+
+msgid "Publish Post"
+msgstr "Publish Post"
+
+msgid "Publishing..."
+msgstr "Publishing..."
+
+msgid "Post published successfully."
+msgstr "Post published successfully."
+
+msgid "Only Reddit, Instagram, X/Twitter, Imgur, and Facebook URLs are supported right now."
+msgstr "Only Reddit, Instagram, X/Twitter, Imgur, and Facebook URLs are supported right now."

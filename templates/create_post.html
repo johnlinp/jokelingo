@@ -69,8 +69,8 @@
                                 </select>
                                 <span>&rarr;</span>
                                 <select id="targetLanguageCode" name="target_language_code">
-                                    <option value="en">{% trans "English" %}</option>
-                                    <option value="zh-hant">{% trans "Traditional Chinese" %}</option>
+                                    <option value="en">English</option>
+                                    <option value="zh-hant">正體中文</option>
                                 </select>
                             </div>
                         </div>
@@ -159,7 +159,7 @@
             sourceLanguageCode: '{{ source_language_code }}',
             targetLanguageCode: '{{ target_language_code }}',
             authorId: '{{ user.id }}',
-            authorDisplayName: '{{ user.display_name|default:"Anonymous"|escapejs }}'
+            authorDisplayName: '{{ user.display_name|default_if_none:""|escapejs }}'
         });
     </script>
 </body>
