@@ -62,15 +62,15 @@
                             <label for="sourceLanguageCode">{% trans "Language" %}</label>
                             <div class="language-summary-row">
                                 <select id="sourceLanguageCode" name="source_language_code">
-                                    <option value="es">{% trans "Spanish" %}</option>
-                                    <option value="fr">{% trans "French" %}</option>
-                                    <option value="ja">{% trans "Japanese" %}</option>
-                                    <option value="ko">{% trans "Korean" %}</option>
+                                    <option value="es"{% if source_language_code == "es" %} selected{% endif %}>{% trans "Spanish" %}</option>
+                                    <option value="fr"{% if source_language_code == "fr" %} selected{% endif %}>{% trans "French" %}</option>
+                                    <option value="ja"{% if source_language_code == "ja" %} selected{% endif %}>{% trans "Japanese" %}</option>
+                                    <option value="ko"{% if source_language_code == "ko" %} selected{% endif %}>{% trans "Korean" %}</option>
                                 </select>
                                 <span>&rarr;</span>
                                 <select id="targetLanguageCode" name="target_language_code">
-                                    <option value="en">English</option>
-                                    <option value="zh-hant">正體中文</option>
+                                    <option value="en"{% if target_language_code == "en" %} selected{% endif %}>English</option>
+                                    <option value="zh-hant"{% if target_language_code == "zh-hant" %} selected{% endif %}>正體中文</option>
                                 </select>
                             </div>
                         </div>
