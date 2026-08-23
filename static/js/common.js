@@ -38,6 +38,66 @@ function getLanguageName(languageCode) {
 // Make it globally accessible
 window.getLanguageName = getLanguageName;
 
+// Set up the shared language-pair selector used by feed and post pages.
+function initLanguageMenu(sourceLanguageCode, targetLanguageCode) {
+    const trigger = document.getElementById('headerBadge');
+    const container = document.getElementById('languageMenuContainer');
+    const dropdown = document.getElementById('languageMenuDropdown');
+    const moreLanguagesModal = document.getElementById('moreLanguagesModal');
+    const closeMoreLanguagesModal = document.getElementById('closeMoreLanguagesModal');
+
+    if (!trigger || !dropdown) return;
+
+    const languagePairs = targetLanguageCode === 'en'
+        ? [['es', 'en'], ['fr', 'en'], ['ja', 'en'], ['ko', 'en']]
+        : targetLanguageCode === 'zh-hant'
+            ? [['es', 'zh-hant'], ['ja', 'zh-hant'], ['ko', 'zh-hant']]
+            : [];
+
+    trigger.textContent = `${getLanguageName(sourceLanguageCode)} → ${getLanguageName(targetLanguageCode)}`;
+    if (container) container.style.display = 'block';
+
+    dropdown.innerHTML = languagePairs
+        .map(([source, target]) => (
+            `<a href="/${source}/${target}/" class="language-menu-item">${getLanguageName(source)} → ${getLanguageName(target)}</a>`
+        ))
+        .join('') + `<a href="#" class="language-menu-item" id="moreLanguagesBtn">${t('More Languages')}</a>`;
+
+    trigger.addEventListener('click', (event) => {
+        event.stopPropagation();
+        const wasShown = dropdown.classList.contains('show');
+        dropdown.classList.toggle('show');
+        if (!wasShown && dropdown.classList.contains('show')) {
+            trackAnalyticsEvent('language_menu_expand');
+        }
+    });
+
+    document.addEventListener('click', (event) => {
+        if (!trigger.contains(event.target) && !dropdown.contains(event.target)) {
+            dropdown.classList.remove('show');
+        }
+    });
+
+    const closeMoreLanguagesModalFunc = () => {
+        moreLanguagesModal?.classList.remove('show');
+    };
+    document.getElementById('moreLanguagesBtn')?.addEventListener('click', (event) => {
+        event.preventDefault();
+        dropdown.classList.remove('show');
+        moreLanguagesModal?.classList.add('show');
+        trackAnalyticsEvent('more_languages_click');
+    });
+    closeMoreLanguagesModal?.addEventListener('click', closeMoreLanguagesModalFunc);
+    moreLanguagesModal?.addEventListener('click', (event) => {
+        if (event.target === moreLanguagesModal) closeMoreLanguagesModalFunc();
+    });
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') closeMoreLanguagesModalFunc();
+    });
+}
+
+window.initLanguageMenu = initLanguageMenu;
+
 // Get CSRF token from cookie
 function getCookie(name) {
     let cookieValue = null;

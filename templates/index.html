@@ -139,6 +139,7 @@
         {% trans "Spanish" as msg_spanish %}
         {% trans "English" as msg_english %}
         {% trans "French" as msg_french %}
+        {% trans "More Languages" as msg_more_languages %}
         window.i18n = {
             'No posts found.': '{{ msg_no_posts|escapejs }}',
             'Load More': '{{ msg_load_more|escapejs }}',
@@ -155,7 +156,8 @@
             'Traditional Chinese': '{{ msg_traditional_chinese|escapejs }}',
             'Spanish': '{{ msg_spanish|escapejs }}',
             'English': '{{ msg_english|escapejs }}',
-            'French': '{{ msg_french|escapejs }}'
+            'French': '{{ msg_french|escapejs }}',
+            'More Languages': '{{ msg_more_languages|escapejs }}'
         };
         
         // Initialize the page with Django template variables

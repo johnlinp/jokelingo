@@ -24,6 +24,10 @@
             <p>{% trans "Laugh in every language" %}</p>
         </div>
         <div class="top-bar-right">
+            <div class="language-menu-container" id="languageMenuContainer" style="display: none;">
+                <div class="header-badge" id="headerBadge"></div>
+                <div class="language-menu-dropdown" id="languageMenuDropdown"></div>
+            </div>
             {% if user.is_authenticated %}
                 <div class="user-menu-container">
                     <div class="user-display-name" id="userMenuTrigger">{{ user.display_name }}</div>
@@ -35,6 +39,34 @@
             {% else %}
                 <a class="login-btn" href="/login/?next=/post/{{ short_code }}/">{% trans "Login" %}</a>
             {% endif %}
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="moreLanguagesModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>{% trans "More Languages" %}</h2>
+                <button class="modal-close" id="closeMoreLanguagesModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="margin-bottom: 20px;">
+                    <p style="font-weight: 600; margin-bottom: 10px;">{% trans "If you know English:" %}</p>
+                    <ul style="list-style: none; padding-left: 0;">
+                        <li style="margin-bottom: 8px;"><a href="/es/en/" style="color: #667eea; text-decoration: none;">{% trans "Spanish → English" %}</a></li>
+                        <li style="margin-bottom: 8px;"><a href="/fr/en/" style="color: #667eea; text-decoration: none;">{% trans "French → English" %}</a></li>
+                        <li style="margin-bottom: 8px;"><a href="/ja/en/" style="color: #667eea; text-decoration: none;">{% trans "Japanese → English" %}</a></li>
+                        <li style="margin-bottom: 8px;"><a href="/ko/en/" style="color: #667eea; text-decoration: none;">{% trans "Korean → English" %}</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <p style="font-weight: 600; margin-bottom: 10px;">{% trans "If you know Chinese:" %}</p>
+                    <ul style="list-style: none; padding-left: 0;">
+                        <li style="margin-bottom: 8px;"><a href="/es/zh-hant/" style="color: #667eea; text-decoration: none;">{% trans "Spanish → Traditional Chinese" %}</a></li>
+                        <li style="margin-bottom: 8px;"><a href="/ja/zh-hant/" style="color: #667eea; text-decoration: none;">{% trans "Japanese → Traditional Chinese" %}</a></li>
+                        <li style="margin-bottom: 8px;"><a href="/ko/zh-hant/" style="color: #667eea; text-decoration: none;">{% trans "Korean → Traditional Chinese" %}</a></li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -62,6 +94,7 @@
         {% trans "Spanish" as msg_spanish %}
         {% trans "English" as msg_english %}
         {% trans "French" as msg_french %}
+        {% trans "More Languages" as msg_more_languages %}
         window.i18n = {
             'Translation': '{{ msg_translation|escapejs }}',
             'Why is it funny?': '{{ msg_explanation|escapejs }}',
@@ -77,7 +110,8 @@
             'Traditional Chinese': '{{ msg_traditional_chinese|escapejs }}',
             'Spanish': '{{ msg_spanish|escapejs }}',
             'English': '{{ msg_english|escapejs }}',
-            'French': '{{ msg_french|escapejs }}'
+            'French': '{{ msg_french|escapejs }}',
+            'More Languages': '{{ msg_more_languages|escapejs }}'
         };
         initPostDetailPage({
             isAuthenticated: {% if user.is_authenticated %}true{% else %}false{% endif %},

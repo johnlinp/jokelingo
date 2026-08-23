@@ -11,23 +11,6 @@ function initIndexPage(config) {
     // Set as global variable for common.js to access
     window.isAuthenticated = isAuthenticated;
     
-    // Set header badge immediately (runs before DOMContentLoaded)
-    function setHeaderBadge() {
-        const sourceName = getLanguageName(sourceLanguageCode);
-        const targetName = getLanguageName(targetLanguageCode);
-        const headerBadge = document.getElementById('headerBadge');
-        if (headerBadge) {
-            headerBadge.textContent = `${sourceName} → ${targetName}`;
-        }
-    }
-    
-    // Set header badge immediately if DOM is ready, otherwise wait for it
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', setHeaderBadge);
-    } else {
-        setHeaderBadge();
-    }
-    
     let currentCursor = null;
     let currentParams = {};
     
@@ -175,74 +158,6 @@ function initIndexPage(config) {
         });
     }
     
-    // Language menu dropdown functionality
-    function initLanguageMenu() {
-        const trigger = document.getElementById('headerBadge');
-        const dropdown = document.getElementById('languageMenuDropdown');
-        const moreLanguagesBtn = document.getElementById('moreLanguagesBtn');
-        const moreLanguagesModal = document.getElementById('moreLanguagesModal');
-        const closeMoreLanguagesModal = document.getElementById('closeMoreLanguagesModal');
-        
-        if (!trigger || !dropdown) return;
-        
-        // Toggle dropdown on click
-        trigger.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const wasShown = dropdown.classList.contains('show');
-            dropdown.classList.toggle('show');
-            
-            // Track analytics event when dropdown is expanded (not when closed)
-            if (!wasShown && dropdown.classList.contains('show')) {
-                trackAnalyticsEvent('language_menu_expand');
-            }
-        });
-        
-        // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!trigger.contains(e.target) && !dropdown.contains(e.target)) {
-                dropdown.classList.remove('show');
-            }
-        });
-        
-        // More Languages modal functionality
-        if (moreLanguagesBtn && moreLanguagesModal) {
-            // Open modal when "More Languages" is clicked
-            moreLanguagesBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                dropdown.classList.remove('show'); // Close dropdown
-                moreLanguagesModal.classList.add('show');
-                trackAnalyticsEvent('more_languages_click');
-            });
-            
-            // Helper function to close modal
-            function closeMoreLanguagesModalFunc() {
-                if (moreLanguagesModal.classList.contains('show')) {
-                    moreLanguagesModal.classList.remove('show');
-                }
-            }
-            
-            // Close modal when close button is clicked
-            if (closeMoreLanguagesModal) {
-                closeMoreLanguagesModal.addEventListener('click', closeMoreLanguagesModalFunc);
-            }
-            
-            // Close modal when clicking outside the modal content
-            moreLanguagesModal.addEventListener('click', (e) => {
-                if (e.target === moreLanguagesModal) {
-                    closeMoreLanguagesModalFunc();
-                }
-            });
-            
-            // Close modal with Escape key
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && moreLanguagesModal.classList.contains('show')) {
-                    closeMoreLanguagesModalFunc();
-                }
-            });
-        }
-    }
-    
     // Load initial feed on page load
     window.addEventListener('DOMContentLoaded', () => {
         // Track page landing event
@@ -260,6 +175,6 @@ function initIndexPage(config) {
         loadFeed(currentParams);
         initUserMenu();
         initLoginModal();
-        initLanguageMenu();
+        initLanguageMenu(sourceLanguageCode, targetLanguageCode);
     });
 }
