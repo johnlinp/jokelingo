@@ -115,10 +115,21 @@ def post_detail_view(request, short_code):
         status=PostStatus.ACTIVE,
     )
     canonical_url = request.build_absolute_uri(f'/post/{post.short_code}/')
-    return render(request, 'post_detail.html', {
+    response = render(request, 'post_detail.html', {
         'canonical_url': canonical_url,
         'short_code': post.short_code,
     })
+    response.set_cookie(
+        'preferred_language_path',
+        f'/{post.source_language_code}/{post.target_language_code}/',
+        max_age=31536000,
+    )
+    response.set_cookie(
+        'preferred_display_language',
+        post.target_language_code,
+        max_age=31536000,
+    )
+    return response
 
 urlpatterns = [
     path('admin/', admin.site.urls),
