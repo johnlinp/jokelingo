@@ -53,7 +53,7 @@ function initCreatePostPage(config) {
     function renderPreviewPost(post) {
         const authorDisplayName = escapePreviewHtml(post.author?.display_name);
         const languageLine = `${getLanguageName(post.languages.source_language_code)} → ${getLanguageName(post.languages.target_language_code)}`;
-        const authorLine = `${languageLine} • ${t('By')} <strong>${authorDisplayName}</strong> • ${formatDate(post.created_at)}`;
+        const authorLine = `${languageLine} • ${t('By')} <strong>${authorDisplayName}</strong>`;
 
         return `
             <div class="post-card" data-post-id="${post.id}">
@@ -226,7 +226,7 @@ function initCreatePostPage(config) {
             const postCard = previewContainer.querySelector('.post-card');
             const authorDisplayName = escapePreviewHtml(previewPost.author?.display_name);
             const languageLine = `${getLanguageName(previewPost.languages.source_language_code)} → ${getLanguageName(previewPost.languages.target_language_code)}`;
-            const authorLine = `${languageLine} • ${t('By')} <strong>${authorDisplayName}</strong> • ${formatDate(previewPost.created_at)}`;
+            const authorLine = `${languageLine} • ${t('By')} <strong>${authorDisplayName}</strong>`;
             const postAuthor = postCard?.querySelector('.post-author');
 
             previewContainer.style.display = 'grid';
