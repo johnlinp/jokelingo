@@ -45,9 +45,19 @@ body {
 }
 
 .top-bar-left h1 a {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
     text-decoration: none !important;
     color: inherit;
     cursor: pointer;
+}
+
+.site-logo {
+    width: 32px;
+    height: 32px;
+    display: block;
+    flex-shrink: 0;
 }
 
 .top-bar-left p {
