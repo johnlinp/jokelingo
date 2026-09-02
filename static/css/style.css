@@ -319,14 +319,18 @@ body {
         align-items: center;
         gap: 10px;
         width: 100%;
+        container-type: inline-size;
     }
     
     .top-bar-left p {
-        overflow: hidden;
-        text-overflow: ellipsis;
         white-space: nowrap;
-        flex: 1;
-        min-width: 0;
+        flex: 0 0 auto;
+    }
+
+    @container (max-width: 340px) {
+        .top-bar-left p {
+            display: none;
+        }
     }
     
     .top-bar-right {
