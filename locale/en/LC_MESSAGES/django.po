@@ -54,8 +54,8 @@ msgstr "Login"
 msgid "Login to Jokelingo"
 msgstr "Login to Jokelingo"
 
-msgid "Sign in to mark posts as helpful or confusing; and later, to create your own posts. We will never post anything on your behalf."
-msgstr "Sign in to mark posts; and later, to create your own posts. We will never post anything on your behalf."
+msgid "Sign in to react to jokes, save the ones you love, and share laughs of your own!"
+msgstr "Sign in to react to jokes, save the ones you love, and share laughs of your own!"
 
 msgid "Continue with Google"
 msgstr "Continue with Google"

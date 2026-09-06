@@ -12,14 +12,14 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ canonical_url }}">
     <meta property="og:title" content="{% trans 'Login' %} - Jokelingo">
-    <meta property="og:description" content="{% trans 'Sign in to mark posts as helpful or confusing; and later, to create your own posts. We will never post anything on your behalf.' %}">
+    <meta property="og:description" content="{% trans 'Sign in to react to jokes, save the ones you love, and share laughs of your own!' %}">
     <meta property="og:site_name" content="Jokelingo">
     
     <!-- Twitter -->
     <meta name="twitter:card" content="summary">
     <meta name="twitter:url" content="{{ canonical_url }}">
     <meta name="twitter:title" content="{% trans 'Login' %} - Jokelingo">
-    <meta name="twitter:description" content="{% trans 'Sign in to mark posts as helpful or confusing; and later, to create your own posts. We will never post anything on your behalf.' %}">
+    <meta name="twitter:description" content="{% trans 'Sign in to react to jokes, save the ones you love, and share laughs of your own!' %}">
     
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="icon" href="{% static 'images/favicon.ico' %}">
@@ -114,7 +114,7 @@
                 <h2>{% trans "Login to Jokelingo" %}</h2>
             </div>
             <div class="login-body">
-                <p>{% trans "Sign in to mark posts as helpful or confusing; and later, to create your own posts. We will never post anything on your behalf." %}</p>
+                <p>{% trans "Sign in to react to jokes, save the ones you love, and share laughs of your own!" %}</p>
                 <a href="/accounts/google/login/{% if next %}?next={{ next|urlencode }}{% endif %}" class="google-login-btn">
                     <img src="https://fonts.gstatic.com/s/i/productlogos/googleg/v6/24px.svg" alt="Google" width="18" height="18">
                     {% trans "Continue with Google" %}

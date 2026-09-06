@@ -57,8 +57,8 @@ msgstr "登入"
 msgid "Login to Jokelingo"
 msgstr "登入 Jokelingo"
 
-msgid "Sign in to mark posts as helpful or confusing; and later, to create your own posts. We will never post anything on your behalf."
-msgstr "登入以標記貼文；之後的更新時，您可以建立自己的貼文。我們絕不會代表您發布任何內容。"
+msgid "Sign in to react to jokes, save the ones you love, and share laughs of your own!"
+msgstr "登入後就能參與互動並收藏喜歡的貼文，還能分享自己的笑話！"
 
 msgid "Continue with Google"
 msgstr "使用 Google 繼續"
