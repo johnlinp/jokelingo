@@ -128,12 +128,14 @@
         function initLanguageMenu() {
             const trigger = document.getElementById('headerBadge');
             const dropdown = document.getElementById('languageMenuDropdown');
+            const userDropdown = document.getElementById('userMenuDropdown');
             
             if (!trigger || !dropdown) return;
             
             // Toggle dropdown on click
             trigger.addEventListener('click', (e) => {
                 e.stopPropagation();
+                userDropdown?.classList.remove('show');
                 dropdown.classList.toggle('show');
             });
             
@@ -149,12 +151,14 @@
         function initUserMenu() {
             const trigger = document.getElementById('userMenuTrigger');
             const dropdown = document.getElementById('userMenuDropdown');
+            const languageDropdown = document.getElementById('languageMenuDropdown');
             
             if (!trigger || !dropdown) return;
             
             // Toggle dropdown on click
             trigger.addEventListener('click', (e) => {
                 e.stopPropagation();
+                languageDropdown?.classList.remove('show');
                 dropdown.classList.toggle('show');
             });
             

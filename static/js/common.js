@@ -43,6 +43,7 @@ function initLanguageMenu(sourceLanguageCode, targetLanguageCode) {
     const trigger = document.getElementById('headerBadge');
     const container = document.getElementById('languageMenuContainer');
     const dropdown = document.getElementById('languageMenuDropdown');
+    const userDropdown = document.getElementById('userMenuDropdown');
     const moreLanguagesModal = document.getElementById('moreLanguagesModal');
     const closeMoreLanguagesModal = document.getElementById('closeMoreLanguagesModal');
 
@@ -66,6 +67,7 @@ function initLanguageMenu(sourceLanguageCode, targetLanguageCode) {
     trigger.addEventListener('click', (event) => {
         event.stopPropagation();
         const wasShown = dropdown.classList.contains('show');
+        userDropdown?.classList.remove('show');
         dropdown.classList.toggle('show');
         if (!wasShown && dropdown.classList.contains('show')) {
             trackAnalyticsEvent('language_menu_expand');
@@ -852,12 +854,14 @@ function attachPostPermalinkHandlers() {
 function initUserMenu() {
     const trigger = document.getElementById('userMenuTrigger');
     const dropdown = document.getElementById('userMenuDropdown');
+    const languageDropdown = document.getElementById('languageMenuDropdown');
     
     if (!trigger || !dropdown) return;
     
     // Toggle dropdown on click
     trigger.addEventListener('click', (e) => {
         e.stopPropagation();
+        languageDropdown?.classList.remove('show');
         dropdown.classList.toggle('show');
     });
     
