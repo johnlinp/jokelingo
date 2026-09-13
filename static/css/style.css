@@ -501,6 +501,11 @@ body {
 
 .post-card--clickable {
     cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.post-card--clickable:hover {
+    background-color: #f7fafc;
 }
 
 .post-card--clickable:focus-visible {
