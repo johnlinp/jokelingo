@@ -5,6 +5,7 @@ ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 GEOIP_DIR="$ROOT_DIR/vendor/geoip"
 MMDB_PATH="$GEOIP_DIR/dbip-country-lite.mmdb"
 TMP_DIR="$(mktemp -d)"
+DBIP_VERSION="$(date +%Y-%m)"
 
 cleanup() {
   rm -rf "$TMP_DIR"
@@ -16,7 +17,7 @@ download_dbip_lite_db() {
   mkdir -p "$GEOIP_DIR"
 
   echo "Downloading DB-IP Lite country database"
-  curl -fsSL "https://download.db-ip.com/free/dbip-country-lite-2026-08.mmdb.gz" -o "$TMP_DIR/dbip-country-lite.mmdb.gz"
+  curl -fsSL "https://download.db-ip.com/free/dbip-country-lite-$DBIP_VERSION.mmdb.gz" -o "$TMP_DIR/dbip-country-lite.mmdb.gz"
   gunzip -c "$TMP_DIR/dbip-country-lite.mmdb.gz" > "$MMDB_PATH"
 
   echo "Stored DB-IP Lite country DB at $MMDB_PATH"
