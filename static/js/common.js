@@ -857,6 +857,13 @@ function initUserMenu() {
     const languageDropdown = document.getElementById('languageMenuDropdown');
     
     if (!trigger || !dropdown) return;
+
+    const createPostLink = dropdown.querySelector('a[href="/create/"]');
+    createPostLink?.addEventListener('click', () => {
+        trackAnalyticsEvent('create_post_click', {
+            path: window.location.pathname,
+        });
+    });
     
     // Toggle dropdown on click
     trigger.addEventListener('click', (e) => {
