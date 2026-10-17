@@ -109,8 +109,8 @@ msgstr "nice!"
 msgid "confusing"
 msgstr "huh?"
 
-msgid "By"
-msgstr "By"
+msgid "By {author}"
+msgstr "By {author}"
 
 msgid "Loading embedded post..."
 msgstr "Loading embedded post..."

@@ -25,6 +25,10 @@ function t(key) {
     return (window.i18n && window.i18n[key]) || key;
 }
 
+function formatAuthorAttribution(authorHtml) {
+    return t('By {author}').replace('{author}', authorHtml);
+}
+
 // Get translated language name for a language code
 function getLanguageName(languageCode) {
     const englishName = LANGUAGE_NAMES[languageCode];
@@ -235,7 +239,7 @@ function renderPost(post, options = {}) {
     const confusingActive = myEngagementType === "confusing" ? " active" : "";
     
     // Build author line - can be customized
-    let authorLine = `${t('By')} <strong>${post.author.display_name}</strong> • ${formatDate(post.created_at)}`;
+    let authorLine = `${formatAuthorAttribution(`<strong>${post.author.display_name}</strong>`)} • ${formatDate(post.created_at)}`;
     if (options.showLanguageInfo && post.languages) {
         authorLine = `${authorLine} • ${getLanguageName(post.languages.source_language_code)} → ${getLanguageName(post.languages.target_language_code)}`;
     }

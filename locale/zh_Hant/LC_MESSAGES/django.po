@@ -112,8 +112,8 @@ msgstr "讚!"
 msgid "confusing"
 msgstr "蛤?"
 
-msgid "By"
-msgstr "由"
+msgid "By {author}"
+msgstr "{author}"
 
 msgid "Loading embedded post..."
 msgstr "載入嵌入貼文中..."

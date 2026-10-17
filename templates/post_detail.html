@@ -85,7 +85,7 @@
         {% trans "click me" as msg_click_to_reveal %}
         {% trans "helpful" as msg_helpful %}
         {% trans "confusing" as msg_confusing %}
-        {% trans "By" as msg_by %}
+        {% trans "By {author}" as msg_by_author %}
         {% trans "Loading embedded post..." as msg_loading_embed %}
         {% trans "Post not found." as msg_post_not_found %}
         {% trans "Error loading post:" as msg_error_post %}
@@ -102,7 +102,7 @@
             'click me': '{{ msg_click_to_reveal|escapejs }}',
             'helpful': '{{ msg_helpful|escapejs }}',
             'confusing': '{{ msg_confusing|escapejs }}',
-            'By': '{{ msg_by|escapejs }}',
+            'By {author}': '{{ msg_by_author|escapejs }}',
             'Loading embedded post...': '{{ msg_loading_embed|escapejs }}',
             'Post not found.': '{{ msg_post_not_found|escapejs }}',
             'Error loading post:': '{{ msg_error_post|escapejs }}',

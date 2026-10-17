@@ -76,7 +76,7 @@
         {% trans "click me" as msg_click_to_reveal %}
         {% trans "helpful" as msg_helpful %}
         {% trans "confusing" as msg_confusing %}
-        {% trans "By" as msg_by %}
+        {% trans "By {author}" as msg_by_author %}
         {% trans "Loading embedded post..." as msg_loading_embed %}
         {% trans "Korean" as msg_korean %}
         {% trans "Japanese" as msg_japanese %}
@@ -95,7 +95,7 @@
             'click me': '{{ msg_click_to_reveal|escapejs }}',
             'helpful': '{{ msg_helpful|escapejs }}',
             'confusing': '{{ msg_confusing|escapejs }}',
-            'By': '{{ msg_by|escapejs }}',
+            'By {author}': '{{ msg_by_author|escapejs }}',
             'Loading embedded post...': '{{ msg_loading_embed|escapejs }}',
             'Korean': '{{ msg_korean|escapejs }}',
             'Japanese': '{{ msg_japanese|escapejs }}',
