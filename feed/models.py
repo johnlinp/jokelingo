@@ -227,3 +227,12 @@ class AnalyticsEvent(models.Model):
     def __str__(self):
         user_str = str(self.user) if self.user else 'Anonymous'
         return f"{self.event_type} by {user_str} at {self.created_at}"
+
+
+class FilteredAnalyticsEvent(AnalyticsEvent):
+    """Expose a separate admin entry using the existing analytics table."""
+
+    class Meta:
+        proxy = True
+        verbose_name = 'Analytics event (excluding configured users)'
+        verbose_name_plural = 'Analytics events (excluding configured users)'

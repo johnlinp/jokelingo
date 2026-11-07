@@ -3,8 +3,10 @@ Django admin configuration for Jokelingo models.
 """
 
 import json
+from django.conf import settings
 from django.contrib import admin
-from .models import Post, User, EngagementEvent, AnalyticsEvent
+from django.db.models import Q
+from .models import Post, User, EngagementEvent, AnalyticsEvent, FilteredAnalyticsEvent
 
 
 @admin.register(Post)
@@ -122,3 +124,15 @@ class AnalyticsEventAdmin(admin.ModelAdmin):
         return True
     
     date_hierarchy = 'created_at'
+
+
+@admin.register(FilteredAnalyticsEvent)
+class FilteredAnalyticsEventAdmin(AnalyticsEventAdmin):
+    """Separate analytics view excluding the configured accounts."""
+
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+        excluded_users = Q()
+        for email in settings.ANALYTICS_EXCLUDED_USER_EMAILS:
+            excluded_users |= Q(user__email__iexact=email)
+        return queryset.exclude(excluded_users)
