@@ -238,20 +238,20 @@ function renderPost(post, options = {}) {
     const helpfulActive = myEngagementType === "helpful" ? " active" : "";
     const confusingActive = myEngagementType === "confusing" ? " active" : "";
     
+    const isPermalinkEnabled = options.linkToPermalink !== false && post.permalink;
+    const timestamp = formatDate(post.created_at);
+    const timestampHtml = isPermalinkEnabled
+        ? `<a class="post-permalink" href="${post.permalink}">${timestamp}</a>`
+        : timestamp;
+
     // Build author line - can be customized
-    let authorLine = `${formatAuthorAttribution(`<strong>${post.author.display_name}</strong>`)} • ${formatDate(post.created_at)}`;
+    let authorLine = `${formatAuthorAttribution(`<strong>${post.author.display_name}</strong>`)} • ${timestampHtml}`;
     if (options.showLanguageInfo && post.languages) {
         authorLine = `${authorLine} • ${getLanguageName(post.languages.source_language_code)} → ${getLanguageName(post.languages.target_language_code)}`;
     }
     
-    const isPermalinkEnabled = options.linkToPermalink !== false && post.permalink;
-    const permalinkAttributes = isPermalinkEnabled
-        ? ` data-permalink="${post.permalink}" role="link" tabindex="0"`
-        : '';
-    const permalinkClass = isPermalinkEnabled ? ' post-card--clickable' : '';
-
     return `
-        <div class="post-card${permalinkClass}" data-post-id="${post.id}"${permalinkAttributes}>
+        <div class="post-card" data-post-id="${post.id}">
             <div class="post-embed" id="embed-${post.id}">
                 <div class="embed-loading">${t('Loading embedded post...')}</div>
             </div>
@@ -823,33 +823,6 @@ function attachExplanationHandlers() {
             trackAnalyticsEvent(eventType, {
                 post_id: postId
             });
-        });
-    });
-}
-
-function attachPostPermalinkHandlers() {
-    const ignoredSelector = 'a, button, input, textarea, select, summary, details, iframe, .post-embed, .post-contribution h4, .post-engagement';
-
-    document.querySelectorAll('.post-card[data-permalink]').forEach((card) => {
-        if (card.dataset.permalinkBound === 'true') {
-            return;
-        }
-
-        card.dataset.permalinkBound = 'true';
-        card.addEventListener('click', (event) => {
-            const selection = window.getSelection();
-            const hasSelectedText = selection && !selection.isCollapsed;
-
-            if (event.defaultPrevented || hasSelectedText || event.target.closest(ignoredSelector)) {
-                return;
-            }
-            window.location.assign(card.dataset.permalink);
-        });
-        card.addEventListener('keydown', (event) => {
-            if ((event.key === 'Enter' || event.key === ' ') && event.target === card) {
-                event.preventDefault();
-                window.location.assign(card.dataset.permalink);
-            }
         });
     });
 }

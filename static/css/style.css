@@ -499,20 +499,6 @@ body {
     overflow-x: hidden;
 }
 
-.post-card--clickable {
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
-
-.post-card--clickable:hover {
-    background-color: #f7fafc;
-}
-
-.post-card--clickable:focus-visible {
-    outline: 3px solid #667eea;
-    outline-offset: 3px;
-}
-
 .post-card--empty-state {
     display: flex;
     flex-direction: column;
@@ -822,6 +808,20 @@ body {
 .post-author {
     color: #666;
     font-size: 0.9em;
+}
+
+.post-permalink {
+    color: inherit;
+    text-decoration: none;
+}
+
+.post-permalink:hover {
+    text-decoration: underline;
+}
+
+.post-permalink:focus-visible {
+    outline: 3px solid #667eea;
+    outline-offset: 3px;
 }
 
 @media (min-width: 769px) {
