@@ -3,10 +3,22 @@ Django admin configuration for Jokelingo models.
 """
 
 import json
+from ua_parser import parse
 from django.conf import settings
 from django.contrib import admin
 from django.db.models import Q
 from .models import Post, User, EngagementEvent, AnalyticsEvent, FilteredAnalyticsEvent
+
+
+def summarize_user_agent(user_agent):
+    """Display the OS and browser families detected by ua-parser."""
+    if not user_agent or not user_agent.strip():
+        return '-'
+
+    result = parse(user_agent)
+    os_name = result.os.family if result.os else 'Unknown OS'
+    browser_name = result.user_agent.family if result.user_agent else 'Unknown browser'
+    return f'{os_name}, {browser_name}'
 
 
 @admin.register(Post)
@@ -101,10 +113,14 @@ class EngagementEventAdmin(admin.ModelAdmin):
 class AnalyticsEventAdmin(admin.ModelAdmin):
     """Admin interface for AnalyticsEvent model."""
     
-    list_display = ['id', 'event_type', 'user', 'client_country_code', 'metadata_display', 'created_at']
+    list_display = ['id', 'event_type', 'user', 'client_country_code', 'user_agent_display', 'metadata_display', 'created_at']
     list_filter = ['event_type', 'client_country_code', 'created_at']
     search_fields = ['id', 'user__id', 'user__email']
-    readonly_fields = ['id', 'created_at', 'event_type', 'user', 'client_country_code', 'metadata_display', 'user_agent']
+    readonly_fields = ['id', 'created_at', 'event_type', 'user', 'client_country_code', 'metadata_display', 'user_agent_display', 'user_agent']
+
+    @admin.display(description='User agent')
+    def user_agent_display(self, obj):
+        return summarize_user_agent(obj.user_agent)
     
     def metadata_display(self, obj):
         """Display metadata in a readable format."""
