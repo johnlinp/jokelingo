@@ -77,6 +77,8 @@ class PostAdmin(admin.ModelAdmin):
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     """Admin interface for User model."""
+
+    ordering = ['-created_at']
     
     list_display = ['id', 'email', 'display_name', 'created_at']
     search_fields = ['email', 'display_name']
