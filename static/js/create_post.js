@@ -58,7 +58,7 @@ function initCreatePostPage(config) {
         return `
             <div class="post-card" data-post-id="${post.id}">
                 <div class="post-embed" id="embed-${post.id}">
-                    <div class="embed-loading">${t('Loading embedded post...')}</div>
+                    <div class="embed-loading" role="status">${t('Loading embedded post...')}</div>
                 </div>
                 <div class="post-contribution"></div>
                 <div class="post-author">
@@ -240,7 +240,7 @@ function initCreatePostPage(config) {
         if (shouldRemountEmbed) {
             const embedContainer = previewContainer.querySelector(`#embed-${previewPost.id}`);
             if (embedContainer) {
-                embedContainer.innerHTML = `<div class="embed-loading">${t('Loading embedded post...')}</div>`;
+                embedContainer.innerHTML = `<div class="embed-loading" role="status">${t('Loading embedded post...')}</div>`;
             }
             embedPost(previewPost);
             currentPreviewSourceUrl = nextSourceUrl;

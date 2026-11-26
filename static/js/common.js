@@ -253,7 +253,7 @@ function renderPost(post, options = {}) {
     return `
         <div class="post-card" data-post-id="${post.id}">
             <div class="post-embed" id="embed-${post.id}">
-                <div class="embed-loading">${t('Loading embedded post...')}</div>
+                <div class="embed-loading" role="status">${t('Loading embedded post...')}</div>
             </div>
             <div class="post-contribution">
                 ${post.contribution?.translation?.text ? `
@@ -317,6 +317,29 @@ function setEngagementCount(item, count) {
     }
 }
 
+const twitterFramesWithResults = new WeakSet();
+
+window.addEventListener('message', (event) => {
+    if (event.origin !== 'https://platform.twitter.com' && event.origin !== 'https://platform.x.com') return;
+
+    const message = event.data?.['twttr.embed'];
+    if (typeof message?.id !== 'string') return;
+
+    const frame = document.getElementById(message.id);
+    if (frame?.tagName !== 'IFRAME' || !event.source || frame.contentWindow !== event.source) return;
+
+    if (message.method === 'twttr.private.results') {
+        twitterFramesWithResults.add(frame);
+    }
+
+    // X can display its own fallback without emitting a rendered event.
+    if (message.method === 'twttr.private.rendered' ||
+        (message.method === 'twttr.private.resize' && twitterFramesWithResults.has(frame) &&
+         message.params?.[0]?.height > 0)) {
+        frame.dispatchEvent(new Event('twitter-embed-ready', { bubbles: true }));
+    }
+});
+
 function embedPost(post) {
     const embedContainer = document.getElementById(`embed-${post.id}`);
     if (!embedContainer) return;
@@ -326,59 +349,31 @@ function embedPost(post) {
     
     const loadingDiv = embedContainer.querySelector('.embed-loading');
 
-    function waitForEmbedReady(wrapper, isReady) {
-        let settled = false;
-        let observer = null;
-
-        wrapper.style.visibility = 'hidden';
-        wrapper.style.pointerEvents = 'none';
+    function waitForEmbedReady(wrapper) {
+        wrapper.classList.add('is-loading');
+        wrapper.inert = true;
 
         function revealEmbed() {
-            if (settled || !isReady()) {
-                return false;
-            }
-
-            settled = true;
-            if (observer) observer.disconnect();
-
-            wrapper.style.visibility = '';
-            wrapper.style.pointerEvents = '';
-            if (loadingDiv) {
-                loadingDiv.remove();
-            }
-            return true;
+            wrapper.classList.remove('is-loading');
+            wrapper.inert = false;
+            loadingDiv?.remove();
         }
 
-        function watchIframeLoads(root) {
-            if (!root || root.nodeType !== Node.ELEMENT_NODE) return;
+        if (provider === 'twitter') {
+            wrapper.addEventListener('twitter-embed-ready', revealEmbed, { once: true });
+        } else {
+            // Capture load on iframes inserted later by the provider's script.
+            function onFrameLoad(event) {
+                const frame = event.target;
+                if (frame.tagName !== 'IFRAME' || !frame.hasAttribute('src') ||
+                    frame.src === 'about:blank' || frame.contentDocument?.URL === 'about:blank') return;
 
-            if (root.tagName === 'IFRAME') {
-                root.addEventListener('load', revealEmbed, { once: true });
+                wrapper.removeEventListener('load', onFrameLoad, true);
+                revealEmbed();
             }
 
-            root.querySelectorAll('iframe').forEach((iframe) => {
-                iframe.addEventListener('load', revealEmbed, { once: true });
-            });
+            wrapper.addEventListener('load', onFrameLoad, true);
         }
-
-        observer = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-                mutation.addedNodes.forEach((node) => {
-                    watchIframeLoads(node);
-                });
-            });
-            revealEmbed();
-        });
-
-        observer.observe(wrapper, {
-            childList: true,
-            subtree: true,
-            attributes: true,
-            characterData: true,
-        });
-
-        watchIframeLoads(wrapper);
-        requestAnimationFrame(revealEmbed);
     }
     
     if (provider === 'reddit') {
@@ -402,7 +397,7 @@ function embedPost(post) {
         wrapper.appendChild(blockquote);
         embedContainer.appendChild(wrapper);
 
-        waitForEmbedReady(wrapper, () => Boolean(wrapper.querySelector('iframe')));
+        waitForEmbedReady(wrapper);
         
         // Load Reddit embed script if not already loaded
         const existingScript = document.querySelector('script[src*="embed.reddit.com/widgets.js"]');
@@ -450,11 +445,7 @@ function embedPost(post) {
         wrapper.appendChild(blockquote);
         embedContainer.appendChild(wrapper);
 
-        waitForEmbedReady(wrapper, () => {
-            const instagramIframe = wrapper.querySelector('iframe') || blockquote.querySelector('iframe');
-            const hasContent = blockquote.children.length > 0 && blockquote.innerHTML.length > 200;
-            return Boolean(instagramIframe || hasContent);
-        });
+        waitForEmbedReady(wrapper);
         
         // Load Instagram embed script if not already loaded
         if (!window.instgrm) {
@@ -481,12 +472,7 @@ function embedPost(post) {
         wrapper.appendChild(blockquote);
         embedContainer.appendChild(wrapper);
 
-        waitForEmbedReady(wrapper, () => {
-            const twitterIframe = wrapper.querySelector('iframe') || blockquote.querySelector('iframe');
-            const twitterRendered = wrapper.querySelector('.twitter-tweet-rendered') || blockquote.querySelector('.twitter-tweet-rendered');
-            const hasContent = blockquote.innerHTML.length > link.outerHTML.length + 50;
-            return Boolean(twitterIframe || twitterRendered || hasContent);
-        });
+        waitForEmbedReady(wrapper);
         
         // Load Twitter embed script if not already loaded
         if (!window.twttr) {
@@ -527,7 +513,7 @@ function embedPost(post) {
         wrapper.appendChild(blockquote);
         embedContainer.appendChild(wrapper);
 
-        waitForEmbedReady(wrapper, () => Boolean(wrapper.querySelector('iframe')));
+        waitForEmbedReady(wrapper);
         
         // Load Imgur embed script if not already loaded
         if (!document.querySelector('script[src*="s.imgur.com/min/embed.js"]')) {
@@ -552,11 +538,7 @@ function embedPost(post) {
         wrapper.appendChild(fbPost);
         embedContainer.appendChild(wrapper);
 
-        waitForEmbedReady(wrapper, () => {
-            const fbIframe = wrapper.querySelector('iframe');
-            const hasContent = fbPost.children.length > 0 && fbPost.innerHTML.length > 200;
-            return Boolean(fbIframe || hasContent);
-        });
+        waitForEmbedReady(wrapper);
         
         // Load Facebook SDK if not already loaded
         if (!window.FB) {
