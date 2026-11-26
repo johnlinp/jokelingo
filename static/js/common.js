@@ -317,7 +317,9 @@ function setEngagementCount(item, count) {
     }
 }
 
-const twitterFramesWithResults = new WeakSet();
+// TODO: Detect unavailable Reddit, Instagram, Imgur, and Facebook posts using
+// signals from their embed widgets, without calling platform APIs.
+const twitterEmbedStates = new WeakMap();
 
 window.addEventListener('message', (event) => {
     if (event.origin !== 'https://platform.twitter.com' && event.origin !== 'https://platform.x.com') return;
@@ -328,15 +330,27 @@ window.addEventListener('message', (event) => {
     const frame = document.getElementById(message.id);
     if (frame?.tagName !== 'IFRAME' || !event.source || frame.contentWindow !== event.source) return;
 
-    if (message.method === 'twttr.private.results') {
-        twitterFramesWithResults.add(frame);
+    const state = twitterEmbedStates.get(frame);
+    if (state?.settled) return;
+
+    function finishEmbed(eventName) {
+        clearTimeout(state?.missingTimer);
+        twitterEmbedStates.set(frame, { settled: true });
+        frame.dispatchEvent(new Event(eventName, { bubbles: true }));
     }
 
-    // X can display its own fallback without emitting a rendered event.
-    if (message.method === 'twttr.private.rendered' ||
-        (message.method === 'twttr.private.resize' && twitterFramesWithResults.has(frame) &&
-         message.params?.[0]?.height > 0)) {
-        frame.dispatchEvent(new Event('twitter-embed-ready', { bubbles: true }));
+    if (message.method === 'twttr.private.results') {
+        if (!state) twitterEmbedStates.set(frame, {});
+    } else if (message.method === 'twttr.private.rendered') {
+        finishEmbed('twitter-embed-ready');
+    } else if (message.method === 'twttr.private.resize' && state && message.params?.[0]?.height > 0) {
+        if (message.params[0].height === 76) {
+            // X's "Not found" panel reports this height without a rendered event.
+            // Give a live embed time to send a rendered event or resize again.
+            state.missingTimer ??= setTimeout(() => finishEmbed('twitter-embed-missing'), 1500);
+        } else {
+            finishEmbed('twitter-embed-ready');
+        }
     }
 });
 
@@ -361,6 +375,15 @@ function embedPost(post) {
 
         if (provider === 'twitter') {
             wrapper.addEventListener('twitter-embed-ready', revealEmbed, { once: true });
+            wrapper.addEventListener('twitter-embed-missing', () => {
+                // The create-post preview has no permalink and contains editable fields.
+                const card = post.permalink && embedContainer.closest('.post-card');
+                if (card) {
+                    card.remove();
+                } else {
+                    revealEmbed();
+                }
+            }, { once: true });
         } else {
             // Capture load on iframes inserted later by the provider's script.
             function onFrameLoad(event) {
